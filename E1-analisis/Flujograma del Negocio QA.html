@@ -1,0 +1,349 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Flujograma del Negocio QA</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,600&display=swap">
+<style>
+/* Layout: columna de lectura con pestañas por flujo; cada diagrama en su propio contenedor desplazable */
+:root{
+  --bg:#f6f7f5; --surface:#ffffff; --fg:#1d2420; --muted:#5b665f; --line:#d8ddd8;
+  --accent:#0f6b4f; --accent-soft:#e3f0ea; --crit:#b42318; --crit-soft:#fdecea; --warn:#9a6700; --warn-soft:#fdf3d7;
+  --display:"Fraunces",Georgia,serif; --body:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121614; --surface:#1a201d; --fg:#e6ebe7; --muted:#9aa59e; --line:#2e3833;
+  --accent:#5cc69c; --accent-soft:#1d3229; --crit:#f2877d; --crit-soft:#3a1f1c; --warn:#e3b341; --warn-soft:#352c14; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121614; --surface:#1a201d; --fg:#e6ebe7; --muted:#9aa59e; --line:#2e3833;
+  --accent:#5cc69c; --accent-soft:#1d3229; --crit:#f2877d; --crit-soft:#3a1f1c; --warn:#e3b341; --warn-soft:#352c14; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 56px}
+.wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+header h1{font-family:var(--display);font-size:clamp(26px,4vw,36px);margin:0 0 6px;text-wrap:balance;letter-spacing:-.01em}
+header p{margin:0;color:var(--muted);max-width:68ch}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;border-bottom:1px solid var(--line);padding-bottom:12px}
+.tabs button{font:500 13px var(--body);background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+section{display:flex;flex-direction:column;gap:16px}
+h2{font-family:var(--display);font-size:22px;margin:0;text-wrap:balance}
+.lede{margin:0;color:var(--muted);max-width:72ch}
+.diagram{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;overflow-x:auto}
+.diagram pre{margin:0;min-width:640px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;border-radius:3px;border:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-width:0}
+.card h3{margin:0 0 6px;font-size:14px;font-weight:600}
+.card p,.card ul{margin:0;font-size:13.5px;color:var(--muted)}
+.card ul{padding-left:18px}
+code,.mono{font-family:var(--mono);font-size:12.5px}
+.tag{font:500 11px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
+.crit{color:var(--crit)}
+</style>
+
+<div class="wrap">
+<header>
+  <span class="tag">Prueba técnica · QA Senior · Fintech Guatemala</span>
+  <h1>Flujograma del negocio</h1>
+  <p>Cómo opera la plataforma de pagos y onboarding de comercios, y dónde entra QA. Incluye las dos historias del caso: HU-410 (Fase 2, alta sin código con DPI y selfie) y HU-214 (Fase 1, cobro con QR dinámico). Los nodos en rojo marcan los puntos donde la ejecución encontró defectos críticos.</p>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" id="t-panorama" aria-selected="true" data-p="panorama">Panorama</button>
+  <button role="tab" id="t-alta" aria-selected="false" data-p="alta">HU-410 · Alta sin código</button>
+  <button role="tab" id="t-qr" aria-selected="false" data-p="qr">HU-214 · Cobro QR</button>
+  <button role="tab" id="t-qa" aria-selected="false" data-p="qa">Proceso de QA (E1–E9)</button>
+</nav>
+
+<!-- PANORAMA -->
+<section id="panorama" role="tabpanel">
+  <h2>Ciclo de vida del comercio en la plataforma</h2>
+  <p class="lede">El comercio entra por el onboarding (HU-410), cobra a clientes con la Wallet (HU-214) y operaciones cierra el ciclo desde el CMS con reversos, liquidaciones y reportes.</p>
+  <div class="diagram"><pre class="mermaid">
+flowchart LR
+  subgraph ON["1 · Onboarding del comercio (HU-410)"]
+    A1(["Comerciante abre la app"]) --> A2{"¿Tiene código<br/>de invitación?"}
+    A2 -- Sí --> A3["Flujo con código<br/>(asesor lo genera)"]
+    A2 -- No --> A4["Verificación de identidad<br/>DPI + selfie con proveedor IDV"]
+    A4 --> A5["Alta creada y código<br/>generado + consumido"]
+    A3 --> A6(["Cuenta de negocio activa"])
+    A5 --> A6
+  end
+  subgraph CO["2 · Cobro (HU-214)"]
+    B1["POS genera QR dinámico<br/>Q1.00 – Q10,000.00 · vence en 2 min"] --> B2["Cliente escanea con Wallet<br/>y confirma con PIN / biometría"]
+    B2 --> B3["Débito de tarjeta prepago<br/>(límites KYC y diario)"]
+    B3 --> B4["Procesador notifica<br/>por webhook firmado"]
+    B4 --> B5["Push a cliente y comercio"]
+  end
+  subgraph OP["3 · Operaciones (CMS web)"]
+    C1["Revisión manual de identidad"]
+    C2["Reverso mismo día"]
+    C3["Liquidaciones y reportes<br/>(hora Guatemala vs UTC)"]
+  end
+  A6 --> B1
+  A4 -. no decide .-> C1
+  B5 --> C2
+  B5 --> C3
+  </pre></div>
+
+  <div class="grid">
+    <div class="card"><h3>Actores</h3><ul><li>Comerciante / comercio (tenant)</li><li>Cliente con Wallet y tarjeta prepago</li><li>Operaciones (backoffice / CMS)</li><li>Proveedor IDV y procesador de pagos (externos)</li></ul></div>
+    <div class="card"><h3>Sistemas</h3><ul><li>App Wallet (Android/iOS), App POS (Android)</li><li>API REST con JWT, servicios por dominio, mensajería asíncrona</li><li>BD relacional + documental, Kubernetes, CloudWatch</li></ul></div>
+    <div class="card"><h3>Reglas transversales</h3><ul><li>Multi-tenant: recurso ajeno → <code>404</code> sin datos</li><li>Montos como string con 2 decimales, GTQ</li><li>BD y logs en UTC; pantallas en UTC-6</li><li>Idempotency-Key y X-Correlation-Id</li></ul></div>
+  </div>
+</section>
+
+<!-- HU-410 -->
+<section id="alta" role="tabpanel" hidden>
+  <h2>HU-410 · Alta sin código con verificación de identidad</h2>
+  <p class="lede">Flujo de negocio de punta a punta, con los gates de servidor que exige la historia (CA-01 a CA-10). En rojo, los controles que fallaron en la corrida del 20 de octubre.</p>
+  <div class="diagram"><pre class="mermaid">
+flowchart TD
+  S([Comerciante en paso del código]) --> G1{"¿Comercio con función activa<br/>y proveedor soportado?<br/>CA-01"}
+  G1 -- No --> F0["Solo flujo con código<br/>sin mostrar error"]
+  G1 -- Sí --> P1["Elige 'No tengo código'<br/>aviso de captura y privacidad"]
+  P1 --> G2{"¿Intentos < 3 por dispositivo<br/>y comercio en 24 h? CA-08"}
+  G2 -- No --> SUP["Informar y ofrecer soporte"]
+  G2 -- Sí --> P2["POST /v1/identity/sessions<br/>estado PENDING"]
+  P2 --> P3["Proveedor: OCR del DPI<br/>(CUI, nombres, vencimiento...) CA-02"]
+  P3 --> G3{"¿Documento legible<br/>y vigente?"}
+  G3 -- No --> REJ["REJECTED con motivo<br/>recaptura + soporte"]
+  G3 -- Sí --> DOK["DOCUMENT_OK"]
+  DOK --> P4["Prueba de vida + coincidencia facial<br/>umbral del comercio ≥ 0.80 CA-03"]
+  P4 --> G4{"¿Resultado del proveedor?"}
+  G4 -- "No coincide / ataque" --> REJ
+  G4 -- "No decide (listas)" --> G5{"¿Comercio con<br/>revisión manual? CA-09"}
+  G5 -- No --> REJ
+  G5 -- Sí --> MR["MANUAL_REVIEW<br/>operaciones decide en backoffice"]
+  MR --> APR
+  MR --> REJ
+  G4 -- Aprobado --> APR["APPROVED<br/>válido 30 min"]
+  P4 -. abandona .-> CAN["CANCELLED<br/>debe empezar de nuevo"]
+  APR --> WH["Webhook firmado al backend<br/>X-Idv-Signature HMAC"]
+  WH --> P5["App consulta estado y precarga<br/>datos del DPI (no editables) CA-04"]
+  P5 --> P6["Completa datos del negocio<br/>y confirma"]
+  P6 --> G6{"Gate en servidor CA-06<br/>¿APPROVED, no vencida, no usada?"}
+  G6 -- No --> X1["Rechazar creación del alta"]
+  G6 -- Sí --> G7{"¿Mismo DPI ya tiene alta<br/>en este comercio? CA-07"}
+  G7 -- Sí --> R1["Reutilizar alta existente"]
+  G7 -- No --> R2["Crear alta + generar código<br/>+ consumirlo CA-05"]
+  R1 --> CON["CONSUMED"]
+  R2 --> CON
+  CON --> FIN(["Sigue el flujo normal de la app"])
+  APR -. "+30 min sin alta" .-> EXP["EXPIRED"]
+
+  classDef crit fill:#fdecea,stroke:#b42318,color:#7a1610
+  classDef ok fill:#e3f0ea,stroke:#0f6b4f,color:#0b4a37
+  class G1,P4,WH,G6,G7,G2 crit
+  class FIN,CON ok
+  </pre></div>
+
+  <div class="grid">
+    <div class="card"><h3 class="crit">Defectos críticos ligados al flujo</h3><ul>
+      <li>Webhook sin firma se acepta y aprueba</li>
+      <li>El alta toma CUI y nombres del body de la app</li>
+      <li>Webhook saca de REJECTED / CONSUMED a APPROVED</li>
+      <li>Un comercio ve verificaciones de otro</li>
+      <li>Concurrencia crea N altas para la misma verificación</li>
+    </ul></div>
+    <div class="card"><h3>Defectos altos en los gates</h3><ul>
+      <li>Umbral 0.80 no se aplica (0.72 aprueba)</li>
+      <li>Alta con verificación EXPIRED o DOCUMENT_OK</li>
+      <li>M-SUR y M-OESTE pueden crear sesiones</li>
+      <li>Permite 4 intentos (off-by-one)</li>
+      <li>CUI expuesto en mensaje de error e imágenes públicas</li>
+    </ul></div>
+    <div class="card"><h3>Comercios del ambiente</h3><ul>
+      <li><span class="mono">M-NORTE</span> activa · idv-sandbox · revisión sí</li>
+      <li><span class="mono">M-SUR</span> inactiva</li>
+      <li><span class="mono">M-OESTE</span> idv-legacy (no soportado)</li>
+      <li><span class="mono">M-ESTE</span> activa · sin revisión manual</li>
+    </ul></div>
+  </div>
+
+  <div class="diagram"><pre class="mermaid">
+stateDiagram-v2
+  direction LR
+  [*] --> PENDING
+  PENDING --> DOCUMENT_OK
+  PENDING --> APPROVED
+  PENDING --> REJECTED
+  PENDING --> MANUAL_REVIEW
+  PENDING --> CANCELLED
+  DOCUMENT_OK --> APPROVED
+  DOCUMENT_OK --> REJECTED
+  DOCUMENT_OK --> MANUAL_REVIEW
+  DOCUMENT_OK --> CANCELLED
+  MANUAL_REVIEW --> APPROVED: solo operaciones
+  MANUAL_REVIEW --> REJECTED: solo operaciones
+  APPROVED --> CONSUMED: crea o reutiliza alta
+  APPROVED --> EXPIRED: +30 min
+  </pre></div>
+</section>
+
+<!-- HU-214 -->
+<section id="qr" role="tabpanel" hidden>
+  <h2>HU-214 · Cobro con QR dinámico</h2>
+  <p class="lede">Del QR en el POS hasta la conciliación. En rojo, los intercambios X1–X10 que mostraron defectos.</p>
+  <div class="diagram"><pre class="mermaid">
+flowchart TD
+  A([Comercio en POS]) --> B["POST /v1/qr-payments<br/>Idempotency-Key + JWT comercio"]
+  B --> V1{"¿Token válido?"}
+  V1 -- No --> E401["401"]
+  V1 -- Sí --> V2{"¿Monto Q1.00–Q10,000.00<br/>con 2 decimales? CA1"}
+  V2 -- No --> E400["400 AMOUNT_OUT_OF_RANGE"]
+  V2 -- Sí --> V3{"¿Key ya usada?"}
+  V3 -- "Mismo body" --> RP["201 replay, mismo id"]
+  V3 -- "Body distinto" --> E409["409"]
+  V3 -- Nueva --> CR["CREATED · vence en 2 min CA2"]
+  CR --> SC["Cliente escanea en Wallet<br/>SCANNED · ve comercio y monto CA3"]
+  CR -. "2 min sin confirmar" .-> EXP["EXPIRED"]
+  SC -. "2 min" .-> EXP
+  SC --> CF["POST /confirm · PIN o biometría"]
+  CF --> V4{"¿Vigente y en CREATED/SCANNED?"}
+  V4 -- No --> E409b["409"]
+  V4 -- Sí --> V5{"Reglas CA5–CA7<br/>comercio activo · tarjeta activa<br/>KYC 1 ≤ Q2,000 / KYC 2 ≤ Q10,000<br/>saldo · límite diario Q25,000"}
+  V5 -- Falla --> E422["422 · el cobro no cambia"]
+  V5 -- OK --> PR["PROCESSING · débito CA4"]
+  PR --> WH{"Webhook del procesador<br/>firma HMAC válida"}
+  WH -- APPROVED --> AP["APPROVED"]
+  WH -- REJECTED --> RJ["REJECTED · reversa débito CA8"]
+  AP --> PU["Push a cliente y comercio CA9"]
+  RJ --> PU
+  AP --> RV{"¿Operaciones reversa<br/>el mismo día?"}
+  RV -- Sí --> RE["REVERSED · saldo restaurado"]
+  AP --> CN["Conciliación y reporte CMS<br/>corte en hora Guatemala"]
+
+  classDef crit fill:#fdecea,stroke:#b42318,color:#7a1610
+  class V1,V2,V3,V4,WH,CN crit
+  </pre></div>
+
+  <div class="grid">
+    <div class="card"><h3 class="crit">Críticos</h3><ul><li>X5: 403 expone datos de otro comercio (debe ser 404)</li><li>X7: webhook REJECTED antiguo pisa un APPROVED y deja débito sin reverso</li></ul></div>
+    <div class="card"><h3>Altos y medios</h3><ul><li>X3: key reusada con otro monto crea cobro nuevo</li><li>X6: confirma QR vencido</li><li>X1: redondea 150.005; X4: 500 sin token</li><li>X9: monto numérico y fecha sin Z; X10: size 500</li></ul></div>
+    <div class="card"><h3>Decisión de liberación 2.4</h3><p>No-Go para HU-214 por D-301 (doble acreditación al comercio en reenvíos de webhook) y reversos bloqueados por el sandbox. Go condicionado del resto con HU-214 apagada por feature flag.</p></div>
+  </div>
+</section>
+
+<!-- QA -->
+<section id="qa" role="tabpanel" hidden>
+  <h2>Proceso de QA de la Fase 2</h2>
+  <p class="lede">Cómo se encadenan los entregables desde el requerimiento hasta la recomendación. Plazo de 72 horas y presentación de 45 minutos al final.</p>
+  <div class="diagram"><pre class="mermaid">
+flowchart LR
+  IN(["HU-410 + reglas + estados<br/>+ openapi.yaml + qa.db"]) --> E1["E1 · Análisis<br/>ambigüedades y preguntas al PO<br/>peso 10"]
+  E1 --> E2["E2 · Estrategia<br/>riesgos, tipos, entrada/salida<br/>peso 5"]
+  E2 --> E3["E3 · Casos<br/>matriz trazable 15–25<br/>+ smoke · peso 15"]
+  E3 --> E4["E4 · Ejecución<br/>8 reportes completos + tabla<br/>peso 25"]
+  E3 --> E5["E5 · Automatización<br/>Newman + concurrencia<br/>peso 15"]
+  E5 --> E4
+  E4 --> E6["E6 · Datos en BD<br/>SQL, sprint anterior vs propio<br/>altas del 15-oct en UTC-6 · peso 10"]
+  E4 --> E7
+  E6 --> E7["E7 · Informe al PO<br/>Go / Go condicionado / No-Go<br/>+ resumen al CTO · peso 10"]
+  E7 --> E8["E8 · Bitácora de herramientas<br/>uso de IA declarado · peso 5"]
+  E7 --> E9["E9 · Video 5–7 min<br/>ejecución real · peso 5"]
+  E8 --> REPO(["Repo público en GitHub<br/>rama main"])
+  E9 --> REPO
+  REPO --> PRES(["Presentación 45 min<br/>defender y rehacer en vivo"])
+  E1 -. supuestos .-> E4
+  </pre></div>
+
+  <div class="grid">
+    <div class="card"><h3>Estado actual en el proyecto</h3><p>Hay documentos de E1, E2, E4 (con 19 hallazgos preliminares), E6 y E7. La corrida del 20 de octubre: 196 peticiones, 432 validaciones, 45 fallidas; concurrencia 6 de 7 validaciones fallan.</p></div>
+    <div class="card"><h3>Criterio de liberación</h3><p>Sin defectos críticos ni altos abiertos y casos de riesgo alto ejecutados. Con 5 críticos abiertos en HU-410, la lectura actual apunta a No-Go.</p></div>
+  </div>
+</section>
+</div>
+
+<script>
+(function(){
+  const tabs=[...document.querySelectorAll('.tabs button')];
+  function show(id){
+    tabs.forEach(b=>b.setAttribute('aria-selected',String(b.dataset.p===id)));
+    document.querySelectorAll('section[role=tabpanel]').forEach(s=>{s.hidden=s.id!==id});
+  }
+  tabs.forEach(b=>b.addEventListener('click',()=>{show(b.dataset.p);}));
+  const h=(location.hash||'').slice(1);
+  if(['panorama','alta','qr','qa'].includes(h)) show(h);
+})();
+</script>
+
+<!--claude-mermaid-runtime-begin:3477-->
+<style>.mermaid-diagram{margin-block:4px}.mermaid-diagram svg{display:block;margin:0 auto;max-width:100%;height:auto}</style>
+<script src="/_runtime/mermaid-11.16.1.min.js"></script>
+<script>(function(){
+var CFG={"palettes":{"light":{"surface":"#f4efe4","text":"#42392e","line":"#8a7f6d","border":"#7a6c52","bg":"#fffdf8"},"dark":{"surface":"#262b34","text":"#f2f3f5","line":"#a8adb8","border":"#9aa4b8","bg":"#1f232b"}}};
+if(typeof mermaid==='undefined')return;
+var pres=Array.prototype.slice.call(document.querySelectorAll('pre.mermaid')).filter(function(p){if(p.hasAttribute('data-claude-mermaid-claimed'))return false;p.setAttribute('data-claude-mermaid-claimed','1');return true;});
+if(!pres.length)return;
+var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+var root=document.documentElement;
+var items=pres.map(function(pre){
+var mount=document.createElement('div');mount.className='mermaid-diagram';
+return {pre:pre,mount:mount,src:pre.textContent||''};
+});
+var seq=0;
+var renderGen=0;
+var lastKey='';
+function pageBg(fallback){
+var els=[document.body,document.documentElement];
+for(var i=0;i<els.length;i++){
+var c=els[i]&&getComputedStyle(els[i]).backgroundColor;
+if(c&&c!=='transparent'&&c!=='rgba(0, 0, 0, 0)')return c;
+}
+return fallback;
+}
+function render(){
+var theme=root.getAttribute('data-theme');
+var dark=theme==='dark'||(!!(mq&&mq.matches)&&theme!=='light');
+var pal=dark?CFG.palettes.dark:CFG.palettes.light;
+var bg=pageBg(pal.bg);
+var key=(dark?'d':'l')+'|'+bg;
+if(key===lastKey)return;
+lastKey=key;
+var gen=++renderGen;
+var font=getComputedStyle(document.body).fontFamily||'sans-serif';
+var nat={useMaxWidth:false};
+mermaid.initialize({
+startOnLoad:false,securityLevel:'strict',theme:'base',
+flowchart:nat,sequence:nat,er:nat,state:nat,class:nat,pie:nat,
+gantt:nat,journey:nat,timeline:nat,gitGraph:nat,mindmap:nat,xyChart:nat,
+quadrantChart:nat,sankey:nat,c4:nat,requirement:nat,block:nat,
+packet:nat,kanban:nat,architecture:nat,radar:nat,
+themeVariables:{background:bg,mainBkg:pal.surface,primaryColor:pal.surface,
+primaryTextColor:pal.text,lineColor:pal.line,primaryBorderColor:pal.border,
+nodeBorder:pal.border,clusterBorder:pal.border,edgeLabelBackground:bg,
+clusterBkg:'rgba(127,127,127,0.07)',titleColor:pal.text,
+darkMode:dark,rowOdd:bg,rowEven:'rgba(127,127,127,0.07)',
+attributeBackgroundColorOdd:bg,attributeBackgroundColorEven:'rgba(127,127,127,0.07)',
+fontSize:'16px',fontFamily:font},
+themeCSS:'.node rect, .node circle, .node polygon, .node path, .cluster rect { stroke-width: 2px; }'
+});
+items.forEach(function(it){
+var id='claude-mermaid-'+seq++;
+mermaid.render(id,it.src).then(function(r){
+if(gen!==renderGen)return;
+var prev=it.pre.previousElementSibling;
+if(prev&&prev.className==='mermaid-diagram'&&prev!==it.mount)return;
+it.mount.innerHTML=r.svg;
+if(!it.mount.parentNode)it.pre.parentNode.insertBefore(it.mount,it.pre);
+it.pre.style.display='none';
+},function(){
+var scratch=document.getElementById(id);
+if(scratch)scratch.parentNode.removeChild(scratch);
+scratch=document.getElementById('d'+id);
+if(scratch)scratch.parentNode.removeChild(scratch);
+if(gen!==renderGen)return;
+if(it.mount.parentNode)it.mount.parentNode.removeChild(it.mount);
+it.pre.style.display='';
+});
+});
+}
+render();
+if(mq&&mq.addEventListener)mq.addEventListener('change',render);
+if(typeof MutationObserver!=='undefined')new MutationObserver(render).observe(root,{attributes:true,attributeFilter:['data-theme']});
+})();</script>
+<!--claude-mermaid-runtime-end-->
+
+</body></html>

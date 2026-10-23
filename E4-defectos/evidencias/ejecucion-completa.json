@@ -1,0 +1,2212 @@
+[
+ {
+  "name": "Reiniciar ambiente (base y reloj)",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/reset",
+  "code": "200 - OK",
+  "headers": {},
+  "request": null,
+  "response": "{\"reset\":true,\"now\":\"2026-10-21T01:24:33.270Z\"}"
+ },
+ {
+  "name": "TC-01.1 Configuración de M-NORTE",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/onboarding/config",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"merchantId\":\"M-NORTE\",\"selfServeEnabled\":true,\"faceMatchRequired\":true,\"maxAttempts\":3,\"manualReviewEnabled\":true}"
+ },
+ {
+  "name": "TC-01.2 Crear sesión de verificación",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc01-1792545873344-926908"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_b8a6b5b9b589\",\"providerSessionId\":\"ps_8d5e18b97883\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_8d5e18b97883\"}"
+ },
+ {
+  "name": "TC-01.3 Simular proveedor: approved",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_8d5e18b97883/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"approved\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_7e30364924b6\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_5cbc6672b7df\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-01.4 Consultar verificación aprobada",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_b8a6b5b9b589",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_b8a6b5b9b589\",\"status\":\"APPROVED\",\"attempt\":1,\"person\":{\"cui\":\"2913125440101\",\"firstName\":\"Lucía\",\"lastName\":\"Hernández Xol\",\"birthDate\":\"1996-09-15\",\"documentExpiry\":\"2033-04-20\",\"gender\":\"M\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_b8a6b5b9b589/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_b8a6b5b9b589/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_b8a6b5b9b589/selfie.jpg\"},\"expires_at\":\"2026-10-21T01:54:33.367Z\",\"createdAt\":\"2026-10-21T01:24:33.348Z\"}"
+ },
+ {
+  "name": "TC-01.5 Crear alta",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_b8a6b5b9b589",
+   "Idempotency-Key": "9e7689a7-ec2b-4109-a962-665ab3699cdf"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"signupId\":\"sgn_1572cd1d534a\",\"channel\":\"alfa\",\"invitationCode\":\"INV-62E7AE\",\"codeStatus\":\"CONSUMED\",\"person\":{\"cui\":\"2913125440101\",\"firstName\":\"Lucía\",\"lastName\":\"Hernández Xol\"},\"business\":{\"commercialName\":\"Tienda La Ceiba\",\"nit\":\"1234567K\",\"address\":\"5a avenida 10-20 zona 1, Guatemala\",\"phone\":\"55551234\",\"economicActivity\":\"Abarrotería\",\"taxRegime\":\"pequeño contribuyente\",\"paymentMethods\":[\"qr\",\"card\"]},\"verificationId\":\"kyc_b8a6b5b9b589\",\"createdAt\":\"2026-10-21T01:24:33.801Z\"}"
+ },
+ {
+  "name": "TC-01.6 La verificación queda consumida",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_b8a6b5b9b589",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_b8a6b5b9b589\",\"status\":\"CONSUMED\",\"attempt\":1,\"person\":{\"cui\":\"2913125440101\",\"firstName\":\"Lucía\",\"lastName\":\"Hernández Xol\",\"birthDate\":\"1996-09-15\",\"documentExpiry\":\"2033-04-20\",\"gender\":\"M\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_b8a6b5b9b589/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_b8a6b5b9b589/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_b8a6b5b9b589/selfie.jpg\"},\"expires_at\":\"2026-10-21T01:54:33.367Z\",\"createdAt\":\"2026-10-21T01:24:33.348Z\"}"
+ },
+ {
+  "name": "TC-01.7 Consultar el alta",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/signups/sgn_1572cd1d534a",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"signupId\":\"sgn_1572cd1d534a\",\"channel\":\"alfa\",\"invitationCode\":\"INV-62E7AE\",\"codeStatus\":\"CONSUMED\",\"person\":{\"cui\":\"2913125440101\",\"firstName\":\"Lucía\",\"lastName\":\"Hernández Xol\"},\"business\":{\"commercialName\":\"Tienda La Ceiba\",\"nit\":\"1234567K\",\"address\":\"5a avenida 10-20 zona 1, Guatemala\",\"phone\":\"55551234\",\"economicActivity\":\"Abarrotería\",\"taxRegime\":\"pequeño contribuyente\",\"paymentMethods\":[\"qr\",\"card\"]},\"verificationId\":\"kyc_b8a6b5b9b589\",\"createdAt\":\"2026-10-21T01:24:33.801Z\"}"
+ },
+ {
+  "name": "TC-02.1 Configuración de M-SUR (inactiva)",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/onboarding/config",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_sur"
+  },
+  "request": null,
+  "response": "{\"merchantId\":\"M-SUR\",\"selfServeEnabled\":false,\"faceMatchRequired\":true,\"maxAttempts\":3,\"manualReviewEnabled\":true}"
+ },
+ {
+  "name": "TC-02.2 Configuración de M-OESTE (proveedor no soportado)",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/onboarding/config",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_oeste"
+  },
+  "request": null,
+  "response": "{\"merchantId\":\"M-OESTE\",\"selfServeEnabled\":false,\"faceMatchRequired\":true,\"maxAttempts\":3,\"manualReviewEnabled\":true}"
+ },
+ {
+  "name": "TC-02.3 Configuración de M-ESTE (activa, sin revisión manual)",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/onboarding/config",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_este"
+  },
+  "request": null,
+  "response": "{\"merchantId\":\"M-ESTE\",\"selfServeEnabled\":true,\"faceMatchRequired\":true,\"maxAttempts\":3,\"manualReviewEnabled\":false}"
+ },
+ {
+  "name": "TC-02.4 Sesión en M-SUR es rechazada",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_sur",
+   "X-Device-Id": "dev-dev_tc02a-1792545873913-589833"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_e80c4beffab8\",\"providerSessionId\":\"ps_6f233ba9f8d8\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_6f233ba9f8d8\"}"
+ },
+ {
+  "name": "TC-02.5 Sesión en M-OESTE es rechazada",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_oeste",
+   "X-Device-Id": "dev-dev_tc02b-1792545873927-278063"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_6df7b970d41f\",\"providerSessionId\":\"ps_eb82282447a4\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_eb82282447a4\"}"
+ },
+ {
+  "name": "TC-02.6 Sesión en M-ESTE es permitida",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_este",
+   "X-Device-Id": "dev-dev_tc02c-1792545873953-744999"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_ce659edf0c8c\",\"providerSessionId\":\"ps_ed2a48a5028d\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_ed2a48a5028d\"}"
+ },
+ {
+  "name": "TC-03.1 Crear sesión",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc03-1792545873977-55237"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_a96ec5bb895c\",\"providerSessionId\":\"ps_04e3e47abc34\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_04e3e47abc34\"}"
+ },
+ {
+  "name": "TC-03.2 Simular proveedor: face_borderline (aprueba con 0.72)",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_04e3e47abc34/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"face_borderline\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_95c8e47fd906\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_c5a93423a1c4\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-03.3 El backend rechaza por coincidencia bajo 0.80",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_a96ec5bb895c",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_a96ec5bb895c\",\"status\":\"APPROVED\",\"attempt\":1,\"person\":{\"cui\":\"1170389800101\",\"firstName\":\"Diego\",\"lastName\":\"Hernández Xol\",\"birthDate\":\"1990-06-12\",\"documentExpiry\":\"2033-04-20\",\"gender\":\"M\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_a96ec5bb895c/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_a96ec5bb895c/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_a96ec5bb895c/selfie.jpg\"},\"expires_at\":\"2026-10-21T01:54:34.001Z\",\"createdAt\":\"2026-10-21T01:24:33.981Z\"}"
+ },
+ {
+  "name": "TC-03.4 El alta se rechaza",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_a96ec5bb895c",
+   "Idempotency-Key": "45e7e1e0-75b9-40cc-8d91-299eccd206b6"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"signupId\":\"sgn_5cf63fa59aa9\",\"channel\":\"alfa\",\"invitationCode\":\"INV-DF14EB\",\"codeStatus\":\"CONSUMED\",\"person\":{\"cui\":\"1170389800101\",\"firstName\":\"Diego\",\"lastName\":\"Hernández Xol\"},\"business\":{\"commercialName\":\"Tienda La Ceiba\",\"nit\":\"1234567K\",\"address\":\"5a avenida 10-20 zona 1, Guatemala\",\"phone\":\"55551234\",\"economicActivity\":\"Abarrotería\",\"taxRegime\":\"pequeño contribuyente\",\"paymentMethods\":[\"qr\",\"card\"]},\"verificationId\":\"kyc_a96ec5bb895c\",\"createdAt\":\"2026-10-21T01:24:34.429Z\"}"
+ },
+ {
+  "name": "TC-06.1 Sesión que queda en PENDING",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc06a-1792545874457-202757"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_3aa9d38111b6\",\"providerSessionId\":\"ps_cb1f589e3693\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_cb1f589e3693\"}"
+ },
+ {
+  "name": "TC-06.2 Alta con verificación PENDING",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "409 - Conflict",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_3aa9d38111b6",
+   "Idempotency-Key": "87ccc89b-cd06-45ee-b34c-6494f2989da8"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"error\":{\"code\":\"VERIFICATION_NOT_APPROVED\",\"message\":\"La verificación de identidad no está aprobada.\"}}"
+ },
+ {
+  "name": "TC-06.3 Sesión para DOCUMENT_OK",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc06b-1792545874495-201664"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_20ae2eaef20e\",\"providerSessionId\":\"ps_55c24e34958b\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_55c24e34958b\"}"
+ },
+ {
+  "name": "TC-06.4 Simular proveedor: document_only",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_55c24e34958b/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"document_only\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_19cb5ba85641\",\"type\":\"document.processed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-06.5 Verificación en DOCUMENT_OK",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_20ae2eaef20e",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_20ae2eaef20e\",\"status\":\"DOCUMENT_OK\",\"attempt\":1,\"person\":{\"cui\":\"1932149550101\",\"firstName\":\"Sofía\",\"lastName\":\"García Pop\",\"birthDate\":\"1996-07-10\",\"documentExpiry\":\"2033-04-20\",\"gender\":\"M\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_20ae2eaef20e/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_20ae2eaef20e/back.jpg\",\"selfie\":null},\"expires_at\":null,\"createdAt\":\"2026-10-21T01:24:34.499Z\"}"
+ },
+ {
+  "name": "TC-06.6 Alta con verificación DOCUMENT_OK",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_20ae2eaef20e",
+   "Idempotency-Key": "d29d29ce-2ee6-4976-a6d5-4cda16c3546e"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"signupId\":\"sgn_a92752e64e33\",\"channel\":\"alfa\",\"invitationCode\":\"INV-F20738\",\"codeStatus\":\"CONSUMED\",\"person\":{\"cui\":\"1932149550101\",\"firstName\":\"Sofía\",\"lastName\":\"García Pop\"},\"business\":{\"commercialName\":\"Tienda La Ceiba\",\"nit\":\"1234567K\",\"address\":\"5a avenida 10-20 zona 1, Guatemala\",\"phone\":\"55551234\",\"economicActivity\":\"Abarrotería\",\"taxRegime\":\"pequeño contribuyente\",\"paymentMethods\":[\"qr\",\"card\"]},\"verificationId\":\"kyc_20ae2eaef20e\",\"createdAt\":\"2026-10-21T01:24:34.950Z\"}"
+ },
+ {
+  "name": "TC-06.7 Sesión para MANUAL_REVIEW",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc06c-1792545874967-802257"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_6d0bcea7a11f\",\"providerSessionId\":\"ps_ce1c630b9460\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_ce1c630b9460\"}"
+ },
+ {
+  "name": "TC-06.8 Simular proveedor: needs_review",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_ce1c630b9460/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"needs_review\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_ded0b43fe85a\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_22ad57254587\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-06.9 Verificación en MANUAL_REVIEW",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_6d0bcea7a11f",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_6d0bcea7a11f\",\"status\":\"MANUAL_REVIEW\",\"attempt\":1,\"person\":{\"cui\":\"2043768590101\",\"firstName\":\"Andrea\",\"lastName\":\"López Cux\",\"birthDate\":\"1993-04-13\",\"documentExpiry\":\"2033-04-20\",\"gender\":\"F\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_6d0bcea7a11f/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_6d0bcea7a11f/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_6d0bcea7a11f/selfie.jpg\"},\"expires_at\":null,\"createdAt\":\"2026-10-21T01:24:34.972Z\"}"
+ },
+ {
+  "name": "TC-06.10 Alta con verificación MANUAL_REVIEW",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "409 - Conflict",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_6d0bcea7a11f",
+   "Idempotency-Key": "e80dcae8-8be8-4cbb-8820-18af6682a307"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"error\":{\"code\":\"VERIFICATION_NOT_APPROVED\",\"message\":\"La verificación de identidad no está aprobada.\"}}"
+ },
+ {
+  "name": "TC-06.11 El estado no cambió tras el intento",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_6d0bcea7a11f",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_6d0bcea7a11f\",\"status\":\"MANUAL_REVIEW\",\"attempt\":1,\"person\":{\"cui\":\"2043768590101\",\"firstName\":\"Andrea\",\"lastName\":\"López Cux\",\"birthDate\":\"1993-04-13\",\"documentExpiry\":\"2033-04-20\",\"gender\":\"F\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_6d0bcea7a11f/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_6d0bcea7a11f/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_6d0bcea7a11f/selfie.jpg\"},\"expires_at\":null,\"createdAt\":\"2026-10-21T01:24:34.972Z\"}"
+ },
+ {
+  "name": "TC-09.1 Crear sesión",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc09-1792545875050-207565"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_f0e824e64e31\",\"providerSessionId\":\"ps_8c1ca4a84936\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_8c1ca4a84936\"}"
+ },
+ {
+  "name": "TC-09.2 Simular proveedor: approved",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_8c1ca4a84936/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"approved\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_043781ff2d46\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_921f06d2878a\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-09.3 Alta con llave K1",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_f0e824e64e31",
+   "Idempotency-Key": "763f9f27-1b28-4012-b8f8-413122d604be"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"signupId\":\"sgn_715ea54e89e9\",\"channel\":\"alfa\",\"invitationCode\":\"INV-9689DC\",\"codeStatus\":\"CONSUMED\",\"person\":{\"cui\":\"1010038210101\",\"firstName\":\"Andrea\",\"lastName\":\"García Pop\"},\"business\":{\"commercialName\":\"Tienda La Ceiba\",\"nit\":\"1234567K\",\"address\":\"5a avenida 10-20 zona 1, Guatemala\",\"phone\":\"55551234\",\"economicActivity\":\"Abarrotería\",\"taxRegime\":\"pequeño contribuyente\",\"paymentMethods\":[\"qr\",\"card\"]},\"verificationId\":\"kyc_f0e824e64e31\",\"createdAt\":\"2026-10-21T01:24:35.488Z\"}"
+ },
+ {
+  "name": "TC-09.4 Reintento con K1 y la misma solicitud",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_f0e824e64e31",
+   "Idempotency-Key": "763f9f27-1b28-4012-b8f8-413122d604be"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"signupId\":\"sgn_715ea54e89e9\",\"channel\":\"alfa\",\"invitationCode\":\"INV-9689DC\",\"codeStatus\":\"CONSUMED\",\"person\":{\"cui\":\"1010038210101\",\"firstName\":\"Andrea\",\"lastName\":\"García Pop\"},\"business\":{\"commercialName\":\"Tienda La Ceiba\",\"nit\":\"1234567K\",\"address\":\"5a avenida 10-20 zona 1, Guatemala\",\"phone\":\"55551234\",\"economicActivity\":\"Abarrotería\",\"taxRegime\":\"pequeño contribuyente\",\"paymentMethods\":[\"qr\",\"card\"]},\"verificationId\":\"kyc_f0e824e64e31\",\"createdAt\":\"2026-10-21T01:24:35.488Z\"}"
+ },
+ {
+  "name": "TC-09.5 K1 con otra solicitud",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "422 - Unprocessable Entity",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_f0e824e64e31",
+   "Idempotency-Key": "763f9f27-1b28-4012-b8f8-413122d604be"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda El Ceibo\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"error\":{\"code\":\"IDEMPOTENCY_KEY_REUSED\",\"message\":\"La Idempotency-Key ya se usó con otra solicitud.\"}}"
+ },
+ {
+  "name": "TC-09.6 Crear otra sesión",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc09b-1792545875554-159982"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_c12b4c2f62c8\",\"providerSessionId\":\"ps_2ba9d0c75a89\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_2ba9d0c75a89\"}"
+ },
+ {
+  "name": "TC-09.7 Simular proveedor: approved",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_2ba9d0c75a89/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"approved\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_8584c3b92d69\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_247842e1afa8\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-09.8 Alta sin Idempotency-Key",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "400 - Bad Request",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_c12b4c2f62c8"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"error\":{\"code\":\"IDEMPOTENCY_KEY_REQUIRED\",\"message\":\"Falta el header Idempotency-Key.\"}}"
+ },
+ {
+  "name": "TC-15.1 Crear sesión",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc15-1792545875602-216531"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_ba571909f3e9\",\"providerSessionId\":\"ps_0b78c1281810\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_0b78c1281810\"}"
+ },
+ {
+  "name": "TC-15.2 Webhook sin firma",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/webhooks/idv",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\n          \"eventId\": \"evt_manual_1792545875618\",\n          \"sessionId\": \"ps_0b78c1281810\",\n          \"type\": \"check.completed\",\n          \"status\": \"approved\",\n          \"document\": {\n            \"cui\": \"2345678901234\",\n            \"firstName\": \"Lucía\",\n            \"lastName\": \"Tzul Ajú\",\n            \"birthDate\": \"1990-03-12\",\n            \"documentExpiry\": \"2031-06-30\",\n            \"gender\": \"F\",\n            \"nationality\": \"GTM\"\n          },\n          \"liveness\": { \"status\": \"approved\", \"score\": 0.97 },\n          \"faceMatch\": { \"status\": \"approved\", \"score\": 0.95 },\n          \"timestamp\": \"2026-10-21T01:24:35.618Z\"\n        }",
+  "response": "{\"received\":true}"
+ },
+ {
+  "name": "TC-15.3 Webhook firmado con otro secreto",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/webhooks/idv",
+  "code": "401 - Unauthorized",
+  "headers": {
+   "X-Idv-Signature": "sha256=9a54894b8cb4a4303d3fc61510e0fee997d28dbed5819c8a58e705610151392f"
+  },
+  "request": "{\n          \"eventId\": \"evt_manual_1792545875633\",\n          \"sessionId\": \"ps_0b78c1281810\",\n          \"type\": \"check.completed\",\n          \"status\": \"approved\",\n          \"document\": {\n            \"cui\": \"2345678901234\",\n            \"firstName\": \"Lucía\",\n            \"lastName\": \"Tzul Ajú\",\n            \"birthDate\": \"1990-03-12\",\n            \"documentExpiry\": \"2031-06-30\",\n            \"gender\": \"F\",\n            \"nationality\": \"GTM\"\n          },\n          \"liveness\": { \"status\": \"approved\", \"score\": 0.97 },\n          \"faceMatch\": { \"status\": \"approved\", \"score\": 0.95 },\n          \"timestamp\": \"2026-10-21T01:24:35.633Z\"\n        }",
+  "response": "{\"error\":{\"code\":\"INVALID_SIGNATURE\",\"message\":\"Firma inválida.\"}}"
+ },
+ {
+  "name": "TC-15.4 Webhook con el cuerpo alterado después de firmar",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/webhooks/idv",
+  "code": "401 - Unauthorized",
+  "headers": {
+   "X-Idv-Signature": "sha256=8601141cd474e7943b0f8abfdb9e515b658d6e590374bcd937d11c7466438b69"
+  },
+  "request": "{\n          \"eventId\": \"evt_manual_1792545875649\",\n          \"sessionId\": \"ps_0b78c1281810\",\n          \"type\": \"check.completed\",\n          \"status\": \"approved\",\n          \"document\": {\n            \"cui\": \"2345678901234\",\n            \"firstName\": \"Lucía\",\n            \"lastName\": \"Tzul Ajú\",\n            \"birthDate\": \"1990-03-12\",\n            \"documentExpiry\": \"2031-06-30\",\n            \"gender\": \"F\",\n            \"nationality\": \"GTM\"\n          },\n          \"liveness\": { \"status\": \"approved\", \"score\": 0.97 },\n          \"faceMatch\": { \"status\": \"approved\", \"score\": 0.95 },\n          \"timestamp\": \"2026-10-21T01:24:35.649Z\"\n        }",
+  "response": "{\"error\":{\"code\":\"INVALID_SIGNATURE\",\"message\":\"Firma inválida.\"}}"
+ },
+ {
+  "name": "TC-15.5 La verificación sigue en PENDING",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_ba571909f3e9",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_ba571909f3e9\",\"status\":\"APPROVED\",\"attempt\":1,\"person\":{\"cui\":\"2345678901234\",\"firstName\":\"Lucía\",\"lastName\":\"Tzul Ajú\",\"birthDate\":\"1990-03-12\",\"documentExpiry\":\"2031-06-30\",\"gender\":\"F\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_ba571909f3e9/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_ba571909f3e9/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_ba571909f3e9/selfie.jpg\"},\"expires_at\":\"2026-10-21T01:54:35.623Z\",\"createdAt\":\"2026-10-21T01:24:35.606Z\"}"
+ },
+ {
+  "name": "TC-15.6 Webhook con firma válida",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/webhooks/idv",
+  "code": "200 - OK",
+  "headers": {
+   "X-Idv-Signature": "sha256=0bc5ec6e0250594eaf0a9a72087def2aad51a4c296d3c2e82c42bba91da06a89"
+  },
+  "request": "{\n          \"eventId\": \"evt_manual_1792545875677\",\n          \"sessionId\": \"ps_0b78c1281810\",\n          \"type\": \"check.completed\",\n          \"status\": \"approved\",\n          \"document\": {\n            \"cui\": \"2345678901234\",\n            \"firstName\": \"Lucía\",\n            \"lastName\": \"Tzul Ajú\",\n            \"birthDate\": \"1990-03-12\",\n            \"documentExpiry\": \"2031-06-30\",\n            \"gender\": \"F\",\n            \"nationality\": \"GTM\"\n          },\n          \"liveness\": { \"status\": \"approved\", \"score\": 0.97 },\n          \"faceMatch\": { \"status\": \"approved\", \"score\": 0.95 },\n          \"timestamp\": \"2026-10-21T01:24:35.677Z\"\n        }",
+  "response": "{\"received\":true}"
+ },
+ {
+  "name": "TC-15.7 La verificación pasa a APPROVED",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_ba571909f3e9",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_ba571909f3e9\",\"status\":\"APPROVED\",\"attempt\":1,\"person\":{\"cui\":\"2345678901234\",\"firstName\":\"Lucía\",\"lastName\":\"Tzul Ajú\",\"birthDate\":\"1990-03-12\",\"documentExpiry\":\"2031-06-30\",\"gender\":\"F\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_ba571909f3e9/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_ba571909f3e9/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_ba571909f3e9/selfie.jpg\"},\"expires_at\":\"2026-10-21T01:54:35.682Z\",\"createdAt\":\"2026-10-21T01:24:35.606Z\"}"
+ },
+ {
+  "name": "TC-04.1 Sesión para puntaje 0.79",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc04_0-1792545875703-976063"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_595d4113459c\",\"providerSessionId\":\"ps_220302070b01\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_220302070b01\"}"
+ },
+ {
+  "name": "TC-04.2 Webhook approved con faceMatch 0.79",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/webhooks/idv",
+  "code": "200 - OK",
+  "headers": {
+   "X-Idv-Signature": "sha256=fac2406d35716f24441238bb9b2fa1e0f24ee31a41e2ba1ce999147c6376e719"
+  },
+  "request": "{\n          \"eventId\": \"evt_manual_1792545875718_944401\",\n          \"sessionId\": \"ps_220302070b01\",\n          \"type\": \"check.completed\",\n          \"status\": \"approved\",\n          \"document\": {\n            \"cui\": \"2345678901234\",\n            \"firstName\": \"Lucía\",\n            \"lastName\": \"Tzul Ajú\",\n            \"birthDate\": \"1990-03-12\",\n            \"documentExpiry\": \"2031-06-30\",\n            \"gender\": \"F\",\n            \"nationality\": \"GTM\"\n          },\n          \"liveness\": {\n            \"status\": \"approved\",\n            \"score\": 0.97\n          },\n          \"faceMatch\": {\n            \"status\": \"approved\",\n            \"score\": 0.79\n          },\n          \"timestamp\": \"2026-10-21T01:24:35.718Z\"\n        }",
+  "response": "{\"received\":true}"
+ },
+ {
+  "name": "TC-04.3 Resultado con puntaje 0.79 → REJECTED",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_595d4113459c",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_595d4113459c\",\"status\":\"APPROVED\",\"attempt\":1,\"person\":{\"cui\":\"2345678901234\",\"firstName\":\"Lucía\",\"lastName\":\"Tzul Ajú\",\"birthDate\":\"1990-03-12\",\"documentExpiry\":\"2031-06-30\",\"gender\":\"F\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_595d4113459c/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_595d4113459c/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_595d4113459c/selfie.jpg\"},\"expires_at\":\"2026-10-21T01:54:35.723Z\",\"createdAt\":\"2026-10-21T01:24:35.707Z\"}"
+ },
+ {
+  "name": "TC-04.4 Sesión para puntaje 0.80",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc04_1-1792545875747-275438"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_f1984f6382e6\",\"providerSessionId\":\"ps_d7a88a8a8a9f\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_d7a88a8a8a9f\"}"
+ },
+ {
+  "name": "TC-04.5 Webhook approved con faceMatch 0.80",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/webhooks/idv",
+  "code": "200 - OK",
+  "headers": {
+   "X-Idv-Signature": "sha256=ff4e2dfc9cb1df95ceb2413ee76c5a508106ab1a7085d3563487b90619280143"
+  },
+  "request": "{\n          \"eventId\": \"evt_manual_1792545875763_380353\",\n          \"sessionId\": \"ps_d7a88a8a8a9f\",\n          \"type\": \"check.completed\",\n          \"status\": \"approved\",\n          \"document\": {\n            \"cui\": \"2345678901234\",\n            \"firstName\": \"Lucía\",\n            \"lastName\": \"Tzul Ajú\",\n            \"birthDate\": \"1990-03-12\",\n            \"documentExpiry\": \"2031-06-30\",\n            \"gender\": \"F\",\n            \"nationality\": \"GTM\"\n          },\n          \"liveness\": {\n            \"status\": \"approved\",\n            \"score\": 0.97\n          },\n          \"faceMatch\": {\n            \"status\": \"approved\",\n            \"score\": 0.8\n          },\n          \"timestamp\": \"2026-10-21T01:24:35.763Z\"\n        }",
+  "response": "{\"received\":true}"
+ },
+ {
+  "name": "TC-04.6 Resultado con puntaje 0.80 → APPROVED",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_f1984f6382e6",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_f1984f6382e6\",\"status\":\"APPROVED\",\"attempt\":1,\"person\":{\"cui\":\"2345678901234\",\"firstName\":\"Lucía\",\"lastName\":\"Tzul Ajú\",\"birthDate\":\"1990-03-12\",\"documentExpiry\":\"2031-06-30\",\"gender\":\"F\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_f1984f6382e6/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_f1984f6382e6/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_f1984f6382e6/selfie.jpg\"},\"expires_at\":\"2026-10-21T01:54:35.767Z\",\"createdAt\":\"2026-10-21T01:24:35.751Z\"}"
+ },
+ {
+  "name": "TC-04.7 Sesión para puntaje 0.81",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc04_2-1792545875790-260253"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_c900790b40a1\",\"providerSessionId\":\"ps_589c076e2410\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_589c076e2410\"}"
+ },
+ {
+  "name": "TC-04.8 Webhook approved con faceMatch 0.81",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/webhooks/idv",
+  "code": "200 - OK",
+  "headers": {
+   "X-Idv-Signature": "sha256=a9a968b034cd1d656b79a3482676c57a5319044de61f25a8cf3f98ea3589de5b"
+  },
+  "request": "{\n          \"eventId\": \"evt_manual_1792545875805_485860\",\n          \"sessionId\": \"ps_589c076e2410\",\n          \"type\": \"check.completed\",\n          \"status\": \"approved\",\n          \"document\": {\n            \"cui\": \"2345678901234\",\n            \"firstName\": \"Lucía\",\n            \"lastName\": \"Tzul Ajú\",\n            \"birthDate\": \"1990-03-12\",\n            \"documentExpiry\": \"2031-06-30\",\n            \"gender\": \"F\",\n            \"nationality\": \"GTM\"\n          },\n          \"liveness\": {\n            \"status\": \"approved\",\n            \"score\": 0.97\n          },\n          \"faceMatch\": {\n            \"status\": \"approved\",\n            \"score\": 0.81\n          },\n          \"timestamp\": \"2026-10-21T01:24:35.805Z\"\n        }",
+  "response": "{\"received\":true}"
+ },
+ {
+  "name": "TC-04.9 Resultado con puntaje 0.81 → APPROVED",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_c900790b40a1",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_c900790b40a1\",\"status\":\"APPROVED\",\"attempt\":1,\"person\":{\"cui\":\"2345678901234\",\"firstName\":\"Lucía\",\"lastName\":\"Tzul Ajú\",\"birthDate\":\"1990-03-12\",\"documentExpiry\":\"2031-06-30\",\"gender\":\"F\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_c900790b40a1/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_c900790b40a1/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_c900790b40a1/selfie.jpg\"},\"expires_at\":\"2026-10-21T01:54:35.810Z\",\"createdAt\":\"2026-10-21T01:24:35.794Z\"}"
+ },
+ {
+  "name": "TC-04.10 Sesión sin puntaje facial",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc04_ns-1792545875833-725875"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_8723ab9967a3\",\"providerSessionId\":\"ps_6ed234d296e9\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_6ed234d296e9\"}"
+ },
+ {
+  "name": "TC-04.11 Webhook approved sin faceMatch",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/webhooks/idv",
+  "code": "200 - OK",
+  "headers": {
+   "X-Idv-Signature": "sha256=47e83f60a20b2531aec8b486390b6f96f628bf6baa2da709b1e45101a254ca3e"
+  },
+  "request": "{\n          \"eventId\": \"evt_manual_1792545875847_78245\",\n          \"sessionId\": \"ps_6ed234d296e9\",\n          \"type\": \"check.completed\",\n          \"status\": \"approved\",\n          \"document\": {\n            \"cui\": \"2345678901234\",\n            \"firstName\": \"Lucía\",\n            \"lastName\": \"Tzul Ajú\",\n            \"birthDate\": \"1990-03-12\",\n            \"documentExpiry\": \"2031-06-30\",\n            \"gender\": \"F\",\n            \"nationality\": \"GTM\"\n          },\n          \"liveness\": {\n            \"status\": \"approved\",\n            \"score\": 0.97\n          },\n          \"timestamp\": \"2026-10-21T01:24:35.847Z\"\n        }",
+  "response": "{\"received\":true}"
+ },
+ {
+  "name": "TC-04.12 Sin puntaje no se aprueba (supuesto A-02)",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_8723ab9967a3",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_8723ab9967a3\",\"status\":\"REJECTED\",\"attempt\":1,\"person\":{\"cui\":\"2345678901234\",\"firstName\":\"Lucía\",\"lastName\":\"Tzul Ajú\",\"birthDate\":\"1990-03-12\",\"documentExpiry\":\"2031-06-30\",\"gender\":\"F\",\"nationality\":\"GTM\"},\"rejectReason\":{\"code\":\"FACE_MISMATCH\",\"message\":\"Tu rostro no coincide con la foto del documento.\"},\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_8723ab9967a3/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_8723ab9967a3/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_8723ab9967a3/selfie.jpg\"},\"expires_at\":null,\"createdAt\":\"2026-10-21T01:24:35.837Z\"}"
+ },
+ {
+  "name": "TC-04.13 Sesión con DPI vencido",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc04_ex-1792545875874-545862"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_3cd32c943ccc\",\"providerSessionId\":\"ps_bfcc2b97f199\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_bfcc2b97f199\"}"
+ },
+ {
+  "name": "TC-04.14 Webhook approved con documentExpiry 2024-01-31",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/webhooks/idv",
+  "code": "200 - OK",
+  "headers": {
+   "X-Idv-Signature": "sha256=1b65ec3a62953abf2fa8bef60745b96cf28080ca015455ec5b00e04b2bf75572"
+  },
+  "request": "{\n          \"eventId\": \"evt_manual_1792545875890_29330\",\n          \"sessionId\": \"ps_bfcc2b97f199\",\n          \"type\": \"check.completed\",\n          \"status\": \"approved\",\n          \"document\": {\n            \"cui\": \"2345678901234\",\n            \"firstName\": \"Lucía\",\n            \"lastName\": \"Tzul Ajú\",\n            \"birthDate\": \"1990-03-12\",\n            \"documentExpiry\": \"2024-01-31\",\n            \"gender\": \"F\",\n            \"nationality\": \"GTM\"\n          },\n          \"liveness\": {\n            \"status\": \"approved\",\n            \"score\": 0.97\n          },\n          \"faceMatch\": {\n            \"status\": \"approved\",\n            \"score\": 0.95\n          },\n          \"timestamp\": \"2026-10-21T01:24:35.890Z\"\n        }",
+  "response": "{\"received\":true}"
+ },
+ {
+  "name": "TC-04.15 El backend rechaza el DPI vencido aunque el proveedor apruebe",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_3cd32c943ccc",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_3cd32c943ccc\",\"status\":\"APPROVED\",\"attempt\":1,\"person\":{\"cui\":\"2345678901234\",\"firstName\":\"Lucía\",\"lastName\":\"Tzul Ajú\",\"birthDate\":\"1990-03-12\",\"documentExpiry\":\"2024-01-31\",\"gender\":\"F\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_3cd32c943ccc/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_3cd32c943ccc/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_3cd32c943ccc/selfie.jpg\"},\"expires_at\":\"2026-10-21T01:54:35.895Z\",\"createdAt\":\"2026-10-21T01:24:35.878Z\"}"
+ },
+ {
+  "name": "TC-04.16 Sesión con datos del DPI incompletos",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc04_in-1792545875918-336628"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_1eb996d9317b\",\"providerSessionId\":\"ps_a061b561768e\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_a061b561768e\"}"
+ },
+ {
+  "name": "TC-04.17 Webhook approved sin documentExpiry ni birthDate",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/webhooks/idv",
+  "code": "500 - Internal Server Error",
+  "headers": {
+   "X-Idv-Signature": "sha256=b2ebecf411b2f3479d99960e3b0899d11b1cea766319c61d71d9fb2db5228b57"
+  },
+  "request": "{\n          \"eventId\": \"evt_manual_1792545875933_244947\",\n          \"sessionId\": \"ps_a061b561768e\",\n          \"type\": \"check.completed\",\n          \"status\": \"approved\",\n          \"document\": {\n            \"cui\": \"2345678901234\",\n            \"firstName\": \"Lucía\",\n            \"lastName\": \"Tzul Ajú\"\n          },\n          \"liveness\": {\n            \"status\": \"approved\",\n            \"score\": 0.97\n          },\n          \"faceMatch\": {\n            \"status\": \"approved\",\n            \"score\": 0.95\n          },\n          \"timestamp\": \"2026-10-21T01:24:35.933Z\"\n        }",
+  "response": "{\"error\":{\"code\":\"INTERNAL_ERROR\",\"message\":\"Error interno.\"}}"
+ },
+ {
+  "name": "TC-04.18 Datos incompletos no se aprueban (depende de A-17)",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_1eb996d9317b",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_1eb996d9317b\",\"status\":\"PENDING\",\"attempt\":1,\"person\":null,\"rejectReason\":null,\"images\":null,\"expires_at\":null,\"createdAt\":\"2026-10-21T01:24:35.922Z\"}"
+ },
+ {
+  "name": "TC-05.1 Sesión para document_expired",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc05_0-1792545875963-608691"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_9a32f2b75ca8\",\"providerSessionId\":\"ps_20720b724af1\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_20720b724af1\"}"
+ },
+ {
+  "name": "TC-05.2 Simular proveedor: document_expired",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_20720b724af1/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"document_expired\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_c9dde5f5233b\",\"type\":\"document.processed\",\"httpStatus\":400},{\"eventId\":\"evt_2908f632be73\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-05.3 REJECTED con motivo DOCUMENT_EXPIRED",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_9a32f2b75ca8",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_9a32f2b75ca8\",\"status\":\"REJECTED\",\"attempt\":1,\"person\":{\"cui\":\"2260536370101\",\"firstName\":\"Pedro\",\"lastName\":\"Ortiz Cumes\",\"birthDate\":\"1991-09-17\",\"documentExpiry\":\"2024-01-31\",\"gender\":\"F\",\"nationality\":\"GTM\"},\"rejectReason\":{\"code\":\"DOCUMENT_EXPIRED\",\"message\":\"El documento 2260536370101 está vencido desde 2024-01-31.\"},\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_9a32f2b75ca8/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_9a32f2b75ca8/back.jpg\",\"selfie\":null},\"expires_at\":null,\"createdAt\":\"2026-10-21T01:24:35.967Z\"}"
+ },
+ {
+  "name": "TC-05.4 Sesión para document_unreadable",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc05_1-1792545876009-16568"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_06e1357ed399\",\"providerSessionId\":\"ps_05dee74865c5\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_05dee74865c5\"}"
+ },
+ {
+  "name": "TC-05.5 Simular proveedor: document_unreadable",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_05dee74865c5/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"document_unreadable\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_2bb3e142d54d\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-05.6 REJECTED con motivo DOCUMENT_UNREADABLE",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_06e1357ed399",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_06e1357ed399\",\"status\":\"REJECTED\",\"attempt\":1,\"person\":null,\"rejectReason\":{\"code\":\"DOCUMENT_UNREADABLE\",\"message\":\"No pudimos leer tu documento. Toma la foto de nuevo con buena luz.\"},\"images\":null,\"expires_at\":null,\"createdAt\":\"2026-10-21T01:24:36.013Z\"}"
+ },
+ {
+  "name": "TC-05.7 Sesión para liveness_failed",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc05_2-1792545876051-940624"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_84f67cbe39ce\",\"providerSessionId\":\"ps_1a2ea7ef9dab\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_1a2ea7ef9dab\"}"
+ },
+ {
+  "name": "TC-05.8 Simular proveedor: liveness_failed",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_1a2ea7ef9dab/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"liveness_failed\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_3aece8b3cf9e\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_211eb8a74372\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-05.9 REJECTED con motivo LIVENESS_FAILED",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_84f67cbe39ce",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_84f67cbe39ce\",\"status\":\"REJECTED\",\"attempt\":1,\"person\":{\"cui\":\"3662845510101\",\"firstName\":\"Lucía\",\"lastName\":\"García Pop\",\"birthDate\":\"1997-04-15\",\"documentExpiry\":\"2033-04-20\",\"gender\":\"M\",\"nationality\":\"GTM\"},\"rejectReason\":{\"code\":\"LIVENESS_FAILED\",\"message\":\"No pudimos confirmar que eres tú. Repite la selfie.\"},\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_84f67cbe39ce/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_84f67cbe39ce/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_84f67cbe39ce/selfie.jpg\"},\"expires_at\":null,\"createdAt\":\"2026-10-21T01:24:36.055Z\"}"
+ },
+ {
+  "name": "TC-05.10 Sesión para face_mismatch",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc05_3-1792545876097-199346"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_bc6c8f514757\",\"providerSessionId\":\"ps_93a91792be84\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_93a91792be84\"}"
+ },
+ {
+  "name": "TC-05.11 Simular proveedor: face_mismatch",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_93a91792be84/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"face_mismatch\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_c19411a56a12\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_682311476fb2\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-05.12 REJECTED con motivo FACE_MISMATCH",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_bc6c8f514757",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_bc6c8f514757\",\"status\":\"REJECTED\",\"attempt\":1,\"person\":{\"cui\":\"2710295530101\",\"firstName\":\"Andrea\",\"lastName\":\"López Cux\",\"birthDate\":\"1990-04-18\",\"documentExpiry\":\"2033-04-20\",\"gender\":\"F\",\"nationality\":\"GTM\"},\"rejectReason\":{\"code\":\"FACE_MISMATCH\",\"message\":\"Tu rostro no coincide con la foto del documento.\"},\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_bc6c8f514757/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_bc6c8f514757/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_bc6c8f514757/selfie.jpg\"},\"expires_at\":null,\"createdAt\":\"2026-10-21T01:24:36.101Z\"}"
+ },
+ {
+  "name": "TC-05.13 Recaptura: nueva sesión con el mismo dispositivo",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc05_0-1792545875963-608691"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_33355d50042a\",\"providerSessionId\":\"ps_f522a5a218d4\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_f522a5a218d4\"}"
+ },
+ {
+  "name": "TC-05.14 La recaptura cuenta como intento 2",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_33355d50042a",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_33355d50042a\",\"status\":\"PENDING\",\"attempt\":2,\"person\":null,\"rejectReason\":null,\"images\":null,\"expires_at\":null,\"createdAt\":\"2026-10-21T01:24:36.148Z\"}"
+ },
+ {
+  "name": "TC-05.15 Sesión con la persona C (DPI vencido 2024-01-31)",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc05_c-1792545876172-400223"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_6069e76b442e\",\"providerSessionId\":\"ps_fbfb099cb3ea\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_fbfb099cb3ea\"}"
+ },
+ {
+  "name": "TC-05.16 Simular proveedor: approved con document C",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_fbfb099cb3ea/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"approved\",\"document\":\"C\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_022fbdc828d5\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_fc023296a656\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-05.17 El backend rechaza el DPI vencido de C",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_6069e76b442e",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_6069e76b442e\",\"status\":\"APPROVED\",\"attempt\":1,\"person\":{\"cui\":\"1987654370901\",\"firstName\":\"Carlos\",\"lastName\":\"Méndez Tum\",\"birthDate\":\"2001-02-14\",\"documentExpiry\":\"2024-01-31\",\"gender\":\"M\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_6069e76b442e/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_6069e76b442e/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_6069e76b442e/selfie.jpg\"},\"expires_at\":\"2026-10-21T01:54:36.194Z\",\"createdAt\":\"2026-10-21T01:24:36.176Z\"}"
+ },
+ {
+  "name": "TC-08.1 Crear sesión",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc08-1792545876217-411185"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_c1a3c6f0f411\",\"providerSessionId\":\"ps_2a21e63cd09a\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_2a21e63cd09a\"}"
+ },
+ {
+  "name": "TC-08.2 Simular proveedor: approved",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_2a21e63cd09a/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"approved\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_2e7fef7115be\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_8a2141a3c8a0\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-08.3 Primera alta",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_c1a3c6f0f411",
+   "Idempotency-Key": "a167890e-29cd-4d35-8098-4e1d2d65f6e9"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"signupId\":\"sgn_4214192f89d0\",\"channel\":\"alfa\",\"invitationCode\":\"INV-FC5060\",\"codeStatus\":\"CONSUMED\",\"person\":{\"cui\":\"1692369870101\",\"firstName\":\"Pedro\",\"lastName\":\"Hernández Xol\"},\"business\":{\"commercialName\":\"Tienda La Ceiba\",\"nit\":\"1234567K\",\"address\":\"5a avenida 10-20 zona 1, Guatemala\",\"phone\":\"55551234\",\"economicActivity\":\"Abarrotería\",\"taxRegime\":\"pequeño contribuyente\",\"paymentMethods\":[\"qr\",\"card\"]},\"verificationId\":\"kyc_c1a3c6f0f411\",\"createdAt\":\"2026-10-21T01:24:36.656Z\"}"
+ },
+ {
+  "name": "TC-08.4 Segunda alta con la misma verificación y otra llave",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "409 - Conflict",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_c1a3c6f0f411",
+   "Idempotency-Key": "4406f1e8-6ad2-45d1-ae97-f56435f3365f"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda El Ceibo\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"error\":{\"code\":\"VERIFICATION_ALREADY_USED\",\"message\":\"La verificación ya se usó.\"}}"
+ },
+ {
+  "name": "TC-11.1 Persona A en M-NORTE: sesión",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc11a-1792545876708-122464"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_8f61cf490b3c\",\"providerSessionId\":\"ps_383f0b908213\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_383f0b908213\"}"
+ },
+ {
+  "name": "TC-11.2 Aprobar con document A",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_383f0b908213/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"approved\",\"document\":\"A\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_38aa07dad27c\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_cc6253eba19f\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-11.3 Alta de A en M-NORTE",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_8f61cf490b3c",
+   "Idempotency-Key": "c09ee0b1-6b5a-4f78-b07b-819831a52611"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"signupId\":\"sgn_025261ffe3d1\",\"channel\":\"alfa\",\"invitationCode\":\"INV-276E19\",\"codeStatus\":\"CONSUMED\",\"person\":{\"cui\":\"2900123420101\",\"firstName\":\"Mateo\",\"lastName\":\"Ruano Sapón\"},\"business\":{\"commercialName\":\"Tienda La Ceiba\",\"nit\":\"1234567K\",\"address\":\"5a avenida 10-20 zona 1, Guatemala\",\"phone\":\"55551234\",\"economicActivity\":\"Abarrotería\",\"taxRegime\":\"pequeño contribuyente\",\"paymentMethods\":[\"qr\",\"card\"]},\"verificationId\":\"kyc_8f61cf490b3c\",\"createdAt\":\"2026-10-21T01:24:37.156Z\"}"
+ },
+ {
+  "name": "TC-11.4 Persona A en M-ESTE: sesión",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_este",
+   "X-Device-Id": "dev-dev_tc11b-1792545877175-176777"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_7846ad03f23c\",\"providerSessionId\":\"ps_953170b448be\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_953170b448be\"}"
+ },
+ {
+  "name": "TC-11.5 Aprobar con document A",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_953170b448be/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"approved\",\"document\":\"A\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_c66209760ee1\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_2fe805cbf233\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-11.6 Alta de A en M-ESTE",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_este",
+   "Verification-Id": "kyc_7846ad03f23c",
+   "Idempotency-Key": "1dbcd6cf-a296-4ba7-8ca7-344f84b94cf3"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"signupId\":\"sgn_206a0676edf4\",\"channel\":\"alfa\",\"invitationCode\":\"INV-DDC3EF\",\"codeStatus\":\"CONSUMED\",\"person\":{\"cui\":\"2900123420101\",\"firstName\":\"Mateo\",\"lastName\":\"Ruano Sapón\"},\"business\":{\"commercialName\":\"Tienda La Ceiba\",\"nit\":\"1234567K\",\"address\":\"5a avenida 10-20 zona 1, Guatemala\",\"phone\":\"55551234\",\"economicActivity\":\"Abarrotería\",\"taxRegime\":\"pequeño contribuyente\",\"paymentMethods\":[\"qr\",\"card\"]},\"verificationId\":\"kyc_7846ad03f23c\",\"createdAt\":\"2026-10-21T01:24:37.622Z\"}"
+ },
+ {
+  "name": "TC-11.7 Persona A otra vez en M-NORTE: sesión",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc11c-1792545877652-165569"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_fdf5f4d56c97\",\"providerSessionId\":\"ps_b61b54529f4a\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_b61b54529f4a\"}"
+ },
+ {
+  "name": "TC-11.8 Aprobar con document A",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_b61b54529f4a/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"approved\",\"document\":\"A\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_6386eaedf453\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_a55f85356725\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-11.9 Alta de A otra vez en M-NORTE, con otros datos de negocio",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_fdf5f4d56c97",
+   "Idempotency-Key": "b420ade3-ba0a-4cdd-b511-20299cbea210"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda El Ceibo\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"signupId\":\"sgn_025261ffe3d1\",\"channel\":\"alfa\",\"invitationCode\":null,\"codeStatus\":null,\"person\":{\"cui\":\"2900123420101\",\"firstName\":\"Mateo\",\"lastName\":\"Ruano Sapón\"},\"business\":{\"commercialName\":\"Tienda La Ceiba\",\"nit\":\"1234567K\",\"address\":\"5a avenida 10-20 zona 1, Guatemala\",\"phone\":\"55551234\",\"economicActivity\":\"Abarrotería\",\"taxRegime\":\"pequeño contribuyente\",\"paymentMethods\":[\"qr\",\"card\"]},\"verificationId\":\"kyc_8f61cf490b3c\",\"createdAt\":\"2026-10-21T01:24:37.156Z\"}"
+ },
+ {
+  "name": "TC-11.10 La verificación reutilizada queda CONSUMED",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_fdf5f4d56c97",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_fdf5f4d56c97\",\"status\":\"CONSUMED\",\"attempt\":1,\"person\":{\"cui\":\"2900123420101\",\"firstName\":\"Mateo\",\"lastName\":\"Ruano Sapón\",\"birthDate\":\"1993-04-17\",\"documentExpiry\":\"2032-08-21\",\"gender\":\"M\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_fdf5f4d56c97/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_fdf5f4d56c97/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_fdf5f4d56c97/selfie.jpg\"},\"expires_at\":\"2026-10-21T01:54:37.685Z\",\"createdAt\":\"2026-10-21T01:24:37.658Z\"}"
+ },
+ {
+  "name": "TC-13.1 M-NORTE: sesión",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc13a-1792545877736-750696"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_ec3e78e88892\",\"providerSessionId\":\"ps_e76c02c0f279\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_e76c02c0f279\"}"
+ },
+ {
+  "name": "TC-13.2 Simular proveedor: needs_review",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_e76c02c0f279/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"needs_review\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_7302eb9f55b5\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_2ab4f22f4560\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-13.3 M-NORTE queda en MANUAL_REVIEW",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_ec3e78e88892",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_ec3e78e88892\",\"status\":\"MANUAL_REVIEW\",\"attempt\":1,\"person\":{\"cui\":\"2700953400101\",\"firstName\":\"Lucía\",\"lastName\":\"Ramírez Tun\",\"birthDate\":\"1999-02-19\",\"documentExpiry\":\"2033-04-20\",\"gender\":\"M\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_ec3e78e88892/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_ec3e78e88892/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_ec3e78e88892/selfie.jpg\"},\"expires_at\":null,\"createdAt\":\"2026-10-21T01:24:37.741Z\"}"
+ },
+ {
+  "name": "TC-13.4 M-ESTE: sesión",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_este",
+   "X-Device-Id": "dev-dev_tc13b-1792545877788-29004"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_65e4a1864fc8\",\"providerSessionId\":\"ps_5573f5de0782\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_5573f5de0782\"}"
+ },
+ {
+  "name": "TC-13.5 Simular proveedor: needs_review",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_5573f5de0782/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"needs_review\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_985c08f96483\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_828fd7e6c217\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-13.6 M-ESTE (sin revisión manual) se rechaza",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_65e4a1864fc8",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_este"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_65e4a1864fc8\",\"status\":\"REJECTED\",\"attempt\":1,\"person\":{\"cui\":\"3702588520101\",\"firstName\":\"Pedro\",\"lastName\":\"García Pop\",\"birthDate\":\"1998-07-16\",\"documentExpiry\":\"2033-04-20\",\"gender\":\"F\",\"nationality\":\"GTM\"},\"rejectReason\":{\"code\":\"REVIEW_NOT_AVAILABLE\",\"message\":\"No pudimos verificar tu identidad. Contacta a soporte.\"},\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_65e4a1864fc8/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_65e4a1864fc8/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_65e4a1864fc8/selfie.jpg\"},\"expires_at\":null,\"createdAt\":\"2026-10-21T01:24:37.793Z\"}"
+ },
+ {
+  "name": "TC-13.7 Resolver con token de la app",
+  "method": "PATCH",
+  "url": "http://localhost:4010/v1/backoffice/verifications/kyc_ec3e78e88892",
+  "code": "403 - Forbidden",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": "{\"decision\":\"APPROVED\",\"reason\":\"Prueba\"}",
+  "response": "{\"error\":{\"code\":\"FORBIDDEN\",\"message\":\"Requiere un usuario de operaciones.\"}}"
+ },
+ {
+  "name": "TC-13.8 Resolver sin reason",
+  "method": "PATCH",
+  "url": "http://localhost:4010/v1/backoffice/verifications/kyc_ec3e78e88892",
+  "code": "400 - Bad Request",
+  "headers": {
+   "Authorization": "Bearer tok_ops_norte"
+  },
+  "request": "{\"decision\":\"APPROVED\"}",
+  "response": "{\"error\":{\"code\":\"VALIDATION_ERROR\",\"message\":\"decision (APPROVED|REJECTED) y reason son obligatorios.\"}}"
+ },
+ {
+  "name": "TC-13.9 Operaciones de M-NORTE resuelve una verificación de M-ESTE",
+  "method": "PATCH",
+  "url": "http://localhost:4010/v1/backoffice/verifications/kyc_65e4a1864fc8",
+  "code": "404 - Not Found",
+  "headers": {
+   "Authorization": "Bearer tok_ops_norte"
+  },
+  "request": "{\"decision\":\"APPROVED\",\"reason\":\"Prueba\"}",
+  "response": "{\"error\":{\"code\":\"VERIFICATION_NOT_FOUND\",\"message\":\"Verificación no encontrada.\"}}"
+ },
+ {
+  "name": "TC-13.10 Operaciones aprueba",
+  "method": "PATCH",
+  "url": "http://localhost:4010/v1/backoffice/verifications/kyc_ec3e78e88892",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_ops_norte"
+  },
+  "request": "{\"decision\":\"APPROVED\",\"reason\":\"Falso positivo en listas restrictivas\"}",
+  "response": "{\"verificationId\":\"kyc_ec3e78e88892\",\"status\":\"APPROVED\",\"attempt\":1,\"person\":{\"cui\":\"2700953400101\",\"firstName\":\"Lucía\",\"lastName\":\"Ramírez Tun\",\"birthDate\":\"1999-02-19\",\"documentExpiry\":\"2033-04-20\",\"gender\":\"M\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_ec3e78e88892/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_ec3e78e88892/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_ec3e78e88892/selfie.jpg\"},\"expires_at\":\"2026-10-21T01:54:37.886Z\",\"createdAt\":\"2026-10-21T01:24:37.741Z\"}"
+ },
+ {
+  "name": "TC-13.11 Resolver otra vez (ya no está en MANUAL_REVIEW)",
+  "method": "PATCH",
+  "url": "http://localhost:4010/v1/backoffice/verifications/kyc_ec3e78e88892",
+  "code": "409 - Conflict",
+  "headers": {
+   "Authorization": "Bearer tok_ops_norte"
+  },
+  "request": "{\"decision\":\"REJECTED\",\"reason\":\"Prueba\"}",
+  "response": "{\"error\":{\"code\":\"INVALID_STATE\",\"message\":\"No se puede resolver una verificación en estado APPROVED.\"}}"
+ },
+ {
+  "name": "TC-13.12 Alta tras la aprobación manual",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_ec3e78e88892",
+   "Idempotency-Key": "07b3e41b-b575-41cd-a7a0-402a3e865fd4"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"signupId\":\"sgn_f486b209f8c8\",\"channel\":\"alfa\",\"invitationCode\":\"INV-951A46\",\"codeStatus\":\"CONSUMED\",\"person\":{\"cui\":\"2700953400101\",\"firstName\":\"Lucía\",\"lastName\":\"Ramírez Tun\"},\"business\":{\"commercialName\":\"Tienda La Ceiba\",\"nit\":\"1234567K\",\"address\":\"5a avenida 10-20 zona 1, Guatemala\",\"phone\":\"55551234\",\"economicActivity\":\"Abarrotería\",\"taxRegime\":\"pequeño contribuyente\",\"paymentMethods\":[\"qr\",\"card\"]},\"verificationId\":\"kyc_ec3e78e88892\",\"createdAt\":\"2026-10-21T01:24:38.319Z\"}"
+ },
+ {
+  "name": "TC-14.1 Sesión que se rechazará",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc14r-1792545878353-50419"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_47688b75b1e3\",\"providerSessionId\":\"ps_d85d692d6ab0\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_d85d692d6ab0\"}"
+ },
+ {
+  "name": "TC-14.2 Simular proveedor: face_mismatch",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_d85d692d6ab0/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"face_mismatch\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_5f4f002b9efb\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_4c83c55799fa\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-14.3 Webhook approved sobre una REJECTED",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/webhooks/idv",
+  "code": "200 - OK",
+  "headers": {
+   "X-Idv-Signature": "sha256=56f667acfa09ef71437e722d8205cecb8c953d1d399d0950d64a05648354c45f"
+  },
+  "request": "{\n          \"eventId\": \"evt_manual_1792545878399_591392\",\n          \"sessionId\": \"ps_d85d692d6ab0\",\n          \"type\": \"check.completed\",\n          \"status\": \"approved\",\n          \"document\": {\n            \"cui\": \"2345678901234\",\n            \"firstName\": \"Lucía\",\n            \"lastName\": \"Tzul Ajú\",\n            \"birthDate\": \"1990-03-12\",\n            \"documentExpiry\": \"2031-06-30\",\n            \"gender\": \"F\",\n            \"nationality\": \"GTM\"\n          },\n          \"liveness\": {\n            \"status\": \"approved\",\n            \"score\": 0.97\n          },\n          \"faceMatch\": {\n            \"status\": \"approved\",\n            \"score\": 0.95\n          },\n          \"timestamp\": \"2026-10-21T01:24:38.399Z\"\n        }",
+  "response": "{\"received\":true}"
+ },
+ {
+  "name": "TC-14.4 Sigue REJECTED",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_47688b75b1e3",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_47688b75b1e3\",\"status\":\"APPROVED\",\"attempt\":1,\"person\":{\"cui\":\"2345678901234\",\"firstName\":\"Lucía\",\"lastName\":\"Tzul Ajú\",\"birthDate\":\"1990-03-12\",\"documentExpiry\":\"2031-06-30\",\"gender\":\"F\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_47688b75b1e3/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_47688b75b1e3/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_47688b75b1e3/selfie.jpg\"},\"expires_at\":\"2026-10-21T01:54:38.405Z\",\"createdAt\":\"2026-10-21T01:24:38.359Z\"}"
+ },
+ {
+  "name": "TC-14.5 Sesión que se consumirá",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc14c-1792545878432-756468"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_f352e0b9e35a\",\"providerSessionId\":\"ps_10587246bcef\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_10587246bcef\"}"
+ },
+ {
+  "name": "TC-14.6 Aprobar",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_10587246bcef/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"approved\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_3f94b6bab4f0\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_6c9189d23417\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-14.7 Crear alta",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_f352e0b9e35a",
+   "Idempotency-Key": "05a142ca-d2c0-4206-827a-fd0f28ef3feb"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"signupId\":\"sgn_bf9bea755ee7\",\"channel\":\"alfa\",\"invitationCode\":\"INV-FC89EF\",\"codeStatus\":\"CONSUMED\",\"person\":{\"cui\":\"1706462390101\",\"firstName\":\"Andrea\",\"lastName\":\"López Cux\"},\"business\":{\"commercialName\":\"Tienda La Ceiba\",\"nit\":\"1234567K\",\"address\":\"5a avenida 10-20 zona 1, Guatemala\",\"phone\":\"55551234\",\"economicActivity\":\"Abarrotería\",\"taxRegime\":\"pequeño contribuyente\",\"paymentMethods\":[\"qr\",\"card\"]},\"verificationId\":\"kyc_f352e0b9e35a\",\"createdAt\":\"2026-10-21T01:24:38.878Z\"}"
+ },
+ {
+  "name": "TC-14.8 Webhook approved sobre una CONSUMED",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/webhooks/idv",
+  "code": "200 - OK",
+  "headers": {
+   "X-Idv-Signature": "sha256=cfee826d15aef2ff15266bf2e3c106835a6a52d149e128e18f683c1372384a02"
+  },
+  "request": "{\n          \"eventId\": \"evt_manual_1792545878910_754289\",\n          \"sessionId\": \"ps_10587246bcef\",\n          \"type\": \"check.completed\",\n          \"status\": \"approved\",\n          \"document\": {\n            \"cui\": \"2345678901234\",\n            \"firstName\": \"Lucía\",\n            \"lastName\": \"Tzul Ajú\",\n            \"birthDate\": \"1990-03-12\",\n            \"documentExpiry\": \"2031-06-30\",\n            \"gender\": \"F\",\n            \"nationality\": \"GTM\"\n          },\n          \"liveness\": {\n            \"status\": \"approved\",\n            \"score\": 0.97\n          },\n          \"faceMatch\": {\n            \"status\": \"approved\",\n            \"score\": 0.95\n          },\n          \"timestamp\": \"2026-10-21T01:24:38.910Z\"\n        }",
+  "response": "{\"received\":true}"
+ },
+ {
+  "name": "TC-14.9 Sigue CONSUMED",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_f352e0b9e35a",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_f352e0b9e35a\",\"status\":\"APPROVED\",\"attempt\":1,\"person\":{\"cui\":\"2345678901234\",\"firstName\":\"Lucía\",\"lastName\":\"Tzul Ajú\",\"birthDate\":\"1990-03-12\",\"documentExpiry\":\"2031-06-30\",\"gender\":\"F\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_f352e0b9e35a/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_f352e0b9e35a/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_f352e0b9e35a/selfie.jpg\"},\"expires_at\":\"2026-10-21T01:54:38.919Z\",\"createdAt\":\"2026-10-21T01:24:38.437Z\"}"
+ },
+ {
+  "name": "TC-14.10 Sesión en revisión manual",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc14m-1792545878951-538553"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_fd6b1339d784\",\"providerSessionId\":\"ps_e0e40ee5aa16\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_e0e40ee5aa16\"}"
+ },
+ {
+  "name": "TC-14.11 Simular proveedor: needs_review",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_e0e40ee5aa16/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"needs_review\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_156c0fe0cdf0\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_860e7bf33e21\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-14.12 Webhook approved sobre una MANUAL_REVIEW",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/webhooks/idv",
+  "code": "200 - OK",
+  "headers": {
+   "X-Idv-Signature": "sha256=24e91c1e33e9dda078058e83b6193e04d4222646fb31fa1ee64f07b6d10c4566"
+  },
+  "request": "{\n          \"eventId\": \"evt_manual_1792545878992_500336\",\n          \"sessionId\": \"ps_e0e40ee5aa16\",\n          \"type\": \"check.completed\",\n          \"status\": \"approved\",\n          \"document\": {\n            \"cui\": \"2345678901234\",\n            \"firstName\": \"Lucía\",\n            \"lastName\": \"Tzul Ajú\",\n            \"birthDate\": \"1990-03-12\",\n            \"documentExpiry\": \"2031-06-30\",\n            \"gender\": \"F\",\n            \"nationality\": \"GTM\"\n          },\n          \"liveness\": {\n            \"status\": \"approved\",\n            \"score\": 0.97\n          },\n          \"faceMatch\": {\n            \"status\": \"approved\",\n            \"score\": 0.95\n          },\n          \"timestamp\": \"2026-10-21T01:24:38.992Z\"\n        }",
+  "response": "{\"received\":true}"
+ },
+ {
+  "name": "TC-14.13 Sigue en MANUAL_REVIEW (solo operaciones la resuelve)",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_fd6b1339d784",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_fd6b1339d784\",\"status\":\"APPROVED\",\"attempt\":1,\"person\":{\"cui\":\"2345678901234\",\"firstName\":\"Lucía\",\"lastName\":\"Tzul Ajú\",\"birthDate\":\"1990-03-12\",\"documentExpiry\":\"2031-06-30\",\"gender\":\"F\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_fd6b1339d784/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_fd6b1339d784/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_fd6b1339d784/selfie.jpg\"},\"expires_at\":\"2026-10-21T01:54:38.997Z\",\"createdAt\":\"2026-10-21T01:24:38.955Z\"}"
+ },
+ {
+  "name": "TC-14.14 Sesión que el usuario abandona tras el documento",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc14d-1792545879024-494568"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_d39a926fafe1\",\"providerSessionId\":\"ps_d6e8fcaface4\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_d6e8fcaface4\"}"
+ },
+ {
+  "name": "TC-14.15 Simular proveedor: document_only",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_d6e8fcaface4/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"document_only\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_6cd0f9e3ee01\",\"type\":\"document.processed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-14.16 Queda en DOCUMENT_OK",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_d39a926fafe1",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_d39a926fafe1\",\"status\":\"DOCUMENT_OK\",\"attempt\":1,\"person\":{\"cui\":\"3122496760101\",\"firstName\":\"Andrea\",\"lastName\":\"Ortiz Cumes\",\"birthDate\":\"1996-05-15\",\"documentExpiry\":\"2033-04-20\",\"gender\":\"M\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_d39a926fafe1/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_d39a926fafe1/back.jpg\",\"selfie\":null},\"expires_at\":null,\"createdAt\":\"2026-10-21T01:24:39.028Z\"}"
+ },
+ {
+  "name": "TC-14.17 La app cancela (DELETE)",
+  "method": "DELETE",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_d39a926fafe1",
+  "code": "204 - No Content",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": null
+ },
+ {
+  "name": "TC-14.18 Queda CANCELLED",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_d39a926fafe1",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_d39a926fafe1\",\"status\":\"CANCELLED\",\"attempt\":1,\"person\":{\"cui\":\"3122496760101\",\"firstName\":\"Andrea\",\"lastName\":\"Ortiz Cumes\",\"birthDate\":\"1996-05-15\",\"documentExpiry\":\"2033-04-20\",\"gender\":\"M\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_d39a926fafe1/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_d39a926fafe1/back.jpg\",\"selfie\":null},\"expires_at\":null,\"createdAt\":\"2026-10-21T01:24:39.028Z\"}"
+ },
+ {
+  "name": "TC-14.19 Webhook approved sobre una CANCELLED",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/webhooks/idv",
+  "code": "200 - OK",
+  "headers": {
+   "X-Idv-Signature": "sha256=d5372f7ec3203ff3862f72e8449d24ec509df5b72dcd3618130c7b535452a898"
+  },
+  "request": "{\n          \"eventId\": \"evt_manual_1792545879102_709883\",\n          \"sessionId\": \"ps_d6e8fcaface4\",\n          \"type\": \"check.completed\",\n          \"status\": \"approved\",\n          \"document\": {\n            \"cui\": \"2345678901234\",\n            \"firstName\": \"Lucía\",\n            \"lastName\": \"Tzul Ajú\",\n            \"birthDate\": \"1990-03-12\",\n            \"documentExpiry\": \"2031-06-30\",\n            \"gender\": \"F\",\n            \"nationality\": \"GTM\"\n          },\n          \"liveness\": {\n            \"status\": \"approved\",\n            \"score\": 0.97\n          },\n          \"faceMatch\": {\n            \"status\": \"approved\",\n            \"score\": 0.95\n          },\n          \"timestamp\": \"2026-10-21T01:24:39.102Z\"\n        }",
+  "response": "{\"received\":true}"
+ },
+ {
+  "name": "TC-14.20 Sigue CANCELLED",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_d39a926fafe1",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_d39a926fafe1\",\"status\":\"APPROVED\",\"attempt\":1,\"person\":{\"cui\":\"2345678901234\",\"firstName\":\"Lucía\",\"lastName\":\"Tzul Ajú\",\"birthDate\":\"1990-03-12\",\"documentExpiry\":\"2031-06-30\",\"gender\":\"F\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_d39a926fafe1/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_d39a926fafe1/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_d39a926fafe1/selfie.jpg\"},\"expires_at\":\"2026-10-21T01:54:39.108Z\",\"createdAt\":\"2026-10-21T01:24:39.028Z\"}"
+ },
+ {
+  "name": "TC-14.21 Cancelar una verificación CONSUMED",
+  "method": "DELETE",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_f352e0b9e35a",
+  "code": "409 - Conflict",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"error\":{\"code\":\"INVALID_STATE\",\"message\":\"No se puede cancelar una verificación en estado APPROVED.\"}}"
+ },
+ {
+  "name": "TC-14.22 Sesión S1 para eventId repetido",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc14e1-1792545879149-25272"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_55224e22d176\",\"providerSessionId\":\"ps_28fc7f262fbb\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_28fc7f262fbb\"}"
+ },
+ {
+  "name": "TC-14.23 Sesión S2 para eventId repetido",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc14e2-1792545879166-608409"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_e934fb5cc193\",\"providerSessionId\":\"ps_8e5cf1ec099e\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_8e5cf1ec099e\"}"
+ },
+ {
+  "name": "TC-14.24 Webhook approved a S1 con eventId X",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/webhooks/idv",
+  "code": "200 - OK",
+  "headers": {
+   "X-Idv-Signature": "sha256=8b2340db8c6a6ed92280ec82c6e4f0e9637558add222925ee24c153e2f301704"
+  },
+  "request": "{\n          \"eventId\": \"evt_manual_1792545879182_684216\",\n          \"sessionId\": \"ps_28fc7f262fbb\",\n          \"type\": \"check.completed\",\n          \"status\": \"approved\",\n          \"document\": {\n            \"cui\": \"2345678901234\",\n            \"firstName\": \"Lucía\",\n            \"lastName\": \"Tzul Ajú\",\n            \"birthDate\": \"1990-03-12\",\n            \"documentExpiry\": \"2031-06-30\",\n            \"gender\": \"F\",\n            \"nationality\": \"GTM\"\n          },\n          \"liveness\": {\n            \"status\": \"approved\",\n            \"score\": 0.97\n          },\n          \"faceMatch\": {\n            \"status\": \"approved\",\n            \"score\": 0.95\n          },\n          \"timestamp\": \"2026-10-21T01:24:39.182Z\"\n        }",
+  "response": "{\"received\":true}"
+ },
+ {
+  "name": "TC-14.25 Mismo eventId X enviado a S2 (se ignora)",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/webhooks/idv",
+  "code": "200 - OK",
+  "headers": {
+   "X-Idv-Signature": "sha256=efb8a4ce2b7b0067f37febf1cdb8b59054c6886b1fc1c18095dc5e307afda761"
+  },
+  "request": "{\n          \"eventId\": \"evt_manual_1792545879182_684216\",\n          \"sessionId\": \"ps_8e5cf1ec099e\",\n          \"type\": \"check.completed\",\n          \"status\": \"approved\",\n          \"document\": {\n            \"cui\": \"2345678901234\",\n            \"firstName\": \"Lucía\",\n            \"lastName\": \"Tzul Ajú\",\n            \"birthDate\": \"1990-03-12\",\n            \"documentExpiry\": \"2031-06-30\",\n            \"gender\": \"F\",\n            \"nationality\": \"GTM\"\n          },\n          \"liveness\": {\n            \"status\": \"approved\",\n            \"score\": 0.97\n          },\n          \"faceMatch\": {\n            \"status\": \"approved\",\n            \"score\": 0.95\n          },\n          \"timestamp\": \"2026-10-21T01:24:39.198Z\"\n        }",
+  "response": "{\"received\":true,\"duplicate\":true}"
+ },
+ {
+  "name": "TC-14.26 S1 quedó APPROVED",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_55224e22d176",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_55224e22d176\",\"status\":\"APPROVED\",\"attempt\":1,\"person\":{\"cui\":\"2345678901234\",\"firstName\":\"Lucía\",\"lastName\":\"Tzul Ajú\",\"birthDate\":\"1990-03-12\",\"documentExpiry\":\"2031-06-30\",\"gender\":\"F\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_55224e22d176/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_55224e22d176/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_55224e22d176/selfie.jpg\"},\"expires_at\":\"2026-10-21T01:54:39.187Z\",\"createdAt\":\"2026-10-21T01:24:39.153Z\"}"
+ },
+ {
+  "name": "TC-14.27 S2 sigue PENDING (el evento repetido no se procesa)",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_e934fb5cc193",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_e934fb5cc193\",\"status\":\"PENDING\",\"attempt\":1,\"person\":null,\"rejectReason\":null,\"images\":null,\"expires_at\":null,\"createdAt\":\"2026-10-21T01:24:39.170Z\"}"
+ },
+ {
+  "name": "TC-16.1 Sesión en M-NORTE",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc16-1792545879242-821925"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_074f3a38e633\",\"providerSessionId\":\"ps_ea1e17a0a870\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_ea1e17a0a870\"}"
+ },
+ {
+  "name": "TC-16.2 Aprobar",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_ea1e17a0a870/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"approved\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_98cbf16c2761\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_717b3079c18a\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-16.2b Segunda sesión aprobada (para TC-16.5)",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc16b-1792545879276-146791"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_5bb9ada3bd5e\",\"providerSessionId\":\"ps_e8194b8c5f60\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_e8194b8c5f60\"}"
+ },
+ {
+  "name": "TC-16.2c Aprobar",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_e8194b8c5f60/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"approved\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_9477e3daa860\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_1812acacdb69\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-16.2d Tercera sesión aprobada (para TC-16.6)",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc16c-1792545879311-895979"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_a08de25c348e\",\"providerSessionId\":\"ps_eb15f9bcf709\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_eb15f9bcf709\"}"
+ },
+ {
+  "name": "TC-16.2e Aprobar",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_eb15f9bcf709/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"approved\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_40c05988c151\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_65f59a82b9b6\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-16.3 M-ESTE no ve la verificación de M-NORTE",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_074f3a38e633",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_este"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_074f3a38e633\",\"status\":\"APPROVED\",\"attempt\":1,\"person\":{\"cui\":\"1449024280101\",\"firstName\":\"Karla\",\"lastName\":\"Hernández Xol\",\"birthDate\":\"1998-09-11\",\"documentExpiry\":\"2033-04-20\",\"gender\":\"M\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_074f3a38e633/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_074f3a38e633/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_074f3a38e633/selfie.jpg\"},\"expires_at\":\"2026-10-21T01:54:39.265Z\",\"createdAt\":\"2026-10-21T01:24:39.246Z\"}"
+ },
+ {
+  "name": "TC-16.4 M-ESTE intenta crear el alta con la verificación de M-NORTE",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "404 - Not Found",
+  "headers": {
+   "Authorization": "Bearer tok_app_este",
+   "Verification-Id": "kyc_074f3a38e633",
+   "Idempotency-Key": "bf6a0b80-9624-4ae4-b481-87bc7f959cb7"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"error\":{\"code\":\"VERIFICATION_NOT_FOUND\",\"message\":\"Verificación no encontrada.\"}}"
+ },
+ {
+  "name": "TC-16.5 Body con datos de persona (otra verificación)",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_5bb9ada3bd5e",
+   "Idempotency-Key": "f99b6b43-3a27-4992-b242-72d7d9d594a4"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          },\n          \"person\": {\n            \"cui\": \"1111111111111\",\n            \"firstName\": \"Otra\",\n            \"lastName\": \"Persona\"\n          }\n        }",
+  "response": "{\"signupId\":\"sgn_1191b8bbb26d\",\"channel\":\"alfa\",\"invitationCode\":\"INV-CA8ACB\",\"codeStatus\":\"CONSUMED\",\"person\":{\"cui\":\"1111111111111\",\"firstName\":\"Otra\",\"lastName\":\"Persona\"},\"business\":{\"commercialName\":\"Tienda La Ceiba\",\"nit\":\"1234567K\",\"address\":\"5a avenida 10-20 zona 1, Guatemala\",\"phone\":\"55551234\",\"economicActivity\":\"Abarrotería\",\"taxRegime\":\"pequeño contribuyente\",\"paymentMethods\":[\"qr\",\"card\"]},\"verificationId\":\"kyc_5bb9ada3bd5e\",\"createdAt\":\"2026-10-21T01:24:39.783Z\"}"
+ },
+ {
+  "name": "TC-16.6 Body con channel y merchantId (otra verificación)",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_a08de25c348e",
+   "Idempotency-Key": "3ae1ee0f-b6cd-4c8b-977a-09b2ea6f66c3"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          },\n          \"channel\": \"beta\",\n          \"merchantId\": \"M-SUR\"\n        }",
+  "response": "{\"signupId\":\"sgn_9d6c413912bb\",\"channel\":\"beta\",\"invitationCode\":\"INV-463EDC\",\"codeStatus\":\"CONSUMED\",\"person\":{\"cui\":\"1713311180101\",\"firstName\":\"Jorge\",\"lastName\":\"Castillo Ajú\"},\"business\":{\"commercialName\":\"Tienda La Ceiba\",\"nit\":\"1234567K\",\"address\":\"5a avenida 10-20 zona 1, Guatemala\",\"phone\":\"55551234\",\"economicActivity\":\"Abarrotería\",\"taxRegime\":\"pequeño contribuyente\",\"paymentMethods\":[\"qr\",\"card\"]},\"verificationId\":\"kyc_a08de25c348e\",\"createdAt\":\"2026-10-21T01:24:40.223Z\"}"
+ },
+ {
+  "name": "TC-16.7 Alta válida en M-NORTE",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_074f3a38e633",
+   "Idempotency-Key": "31e8f9e6-8c35-4c5c-a074-fe65fe6c5457"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"signupId\":\"sgn_3a060e5c53ff\",\"channel\":\"alfa\",\"invitationCode\":\"INV-082EA1\",\"codeStatus\":\"CONSUMED\",\"person\":{\"cui\":\"1449024280101\",\"firstName\":\"Karla\",\"lastName\":\"Hernández Xol\"},\"business\":{\"commercialName\":\"Tienda La Ceiba\",\"nit\":\"1234567K\",\"address\":\"5a avenida 10-20 zona 1, Guatemala\",\"phone\":\"55551234\",\"economicActivity\":\"Abarrotería\",\"taxRegime\":\"pequeño contribuyente\",\"paymentMethods\":[\"qr\",\"card\"]},\"verificationId\":\"kyc_074f3a38e633\",\"createdAt\":\"2026-10-21T01:24:40.661Z\"}"
+ },
+ {
+  "name": "TC-16.8 M-ESTE no ve el alta de M-NORTE",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/signups/sgn_3a060e5c53ff",
+  "code": "404 - Not Found",
+  "headers": {
+   "Authorization": "Bearer tok_app_este"
+  },
+  "request": null,
+  "response": "{\"error\":{\"code\":\"SIGNUP_NOT_FOUND\",\"message\":\"Alta no encontrada.\"}}"
+ },
+ {
+  "name": "TC-17.1 Configuración sin secretos",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/onboarding/config",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"merchantId\":\"M-NORTE\",\"selfServeEnabled\":true,\"faceMatchRequired\":true,\"maxAttempts\":3,\"manualReviewEnabled\":true}"
+ },
+ {
+  "name": "TC-17.2 Sesión sin secretos",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc17-1792545880727-279301"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_218ac6e1a86a\",\"providerSessionId\":\"ps_9a457fa138e1\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_9a457fa138e1\"}"
+ },
+ {
+  "name": "TC-17.3 Simular proveedor: liveness_failed",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_9a457fa138e1/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"liveness_failed\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_2ad7c855c0de\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_6227320aebcb\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-17.4 Verificación rechazada sin secretos y sin CUI en el mensaje",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_218ac6e1a86a",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_218ac6e1a86a\",\"status\":\"REJECTED\",\"attempt\":1,\"person\":{\"cui\":\"1081266420101\",\"firstName\":\"Karla\",\"lastName\":\"López Cux\",\"birthDate\":\"1995-03-15\",\"documentExpiry\":\"2033-04-20\",\"gender\":\"F\",\"nationality\":\"GTM\"},\"rejectReason\":{\"code\":\"LIVENESS_FAILED\",\"message\":\"No pudimos confirmar que eres tú. Repite la selfie.\"},\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_218ac6e1a86a/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_218ac6e1a86a/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_218ac6e1a86a/selfie.jpg\"},\"expires_at\":null,\"createdAt\":\"2026-10-21T01:24:40.732Z\"}"
+ },
+ {
+  "name": "TC-18.1 Crear sesión",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc18-1792545880787-621293"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_a9fafbb148b2\",\"providerSessionId\":\"ps_02364d77a027\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_02364d77a027\"}"
+ },
+ {
+  "name": "TC-18.2 Aprobar",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_02364d77a027/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"approved\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_cb2f18b89e27\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_e94eec02ecf5\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-18.3 Alta con sin commercialName",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "400 - Bad Request",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_a9fafbb148b2",
+   "Idempotency-Key": "9789c744-6a11-4bcc-a255-f10d78e773c4"
+  },
+  "request": "{\n          \"business\": {\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"error\":{\"code\":\"VALIDATION_ERROR\",\"message\":\"business.commercialName es obligatorio\"}}"
+ },
+ {
+  "name": "TC-18.4 Alta con commercialName vacío",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "400 - Bad Request",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_a9fafbb148b2",
+   "Idempotency-Key": "cfa2eaac-bd91-4292-b23e-c334cb19cf24"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"error\":{\"code\":\"VALIDATION_ERROR\",\"message\":\"business.commercialName es obligatorio\"}}"
+ },
+ {
+  "name": "TC-18.5 Alta con NIT de 5 dígitos",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "400 - Bad Request",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_a9fafbb148b2",
+   "Idempotency-Key": "b1daf4e7-f174-402d-ad7e-2c88b2561bc4"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"12345\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"error\":{\"code\":\"VALIDATION_ERROR\",\"message\":\"business.nit no es válido\"}}"
+ },
+ {
+  "name": "TC-18.6 Alta con NIT de 13 caracteres",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "400 - Bad Request",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_a9fafbb148b2",
+   "Idempotency-Key": "98dc7361-6a59-4ca4-95e1-e4c54901f8f6"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"123456789012K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"error\":{\"code\":\"VALIDATION_ERROR\",\"message\":\"business.nit no es válido\"}}"
+ },
+ {
+  "name": "TC-18.7 Alta con NIT con letra inválida",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "400 - Bad Request",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_a9fafbb148b2",
+   "Idempotency-Key": "fcf67706-e184-4bf8-8b33-5dc10972a2e5"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567X\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"error\":{\"code\":\"VALIDATION_ERROR\",\"message\":\"business.nit no es válido\"}}"
+ },
+ {
+  "name": "TC-18.8 Alta con teléfono de 7 dígitos",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "400 - Bad Request",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_a9fafbb148b2",
+   "Idempotency-Key": "23aad5b1-786d-4491-a5e4-46608e852fe8"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"5555123\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"error\":{\"code\":\"VALIDATION_ERROR\",\"message\":\"business.phone debe tener 8 dígitos\"}}"
+ },
+ {
+  "name": "TC-18.9 Alta con teléfono de 9 dígitos",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "400 - Bad Request",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_a9fafbb148b2",
+   "Idempotency-Key": "163f1f65-c60c-4450-8104-26e41b8f6b17"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"555512345\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"error\":{\"code\":\"VALIDATION_ERROR\",\"message\":\"business.phone debe tener 8 dígitos\"}}"
+ },
+ {
+  "name": "TC-18.10 Alta con paymentMethods vacío",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "400 - Bad Request",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_a9fafbb148b2",
+   "Idempotency-Key": "59f8544b-c8b3-43ed-ac88-a28de1fc6cc9"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": []\n          }\n        }",
+  "response": "{\"error\":{\"code\":\"VALIDATION_ERROR\",\"message\":\"business.paymentMethods no es válido\"}}"
+ },
+ {
+  "name": "TC-18.11 Alta con paymentMethods con valor no permitido",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "400 - Bad Request",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_a9fafbb148b2",
+   "Idempotency-Key": "b8336628-b9e9-4928-bbaf-5fb15984aaa9"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"cash\"\n            ]\n          }\n        }",
+  "response": "{\"error\":{\"code\":\"VALIDATION_ERROR\",\"message\":\"business.paymentMethods no es válido\"}}"
+ },
+ {
+  "name": "TC-18.12 Alta con taxRegime no permitido",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "400 - Bad Request",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_a9fafbb148b2",
+   "Idempotency-Key": "fb6afbb7-c8f7-457b-a783-eb429a56027e"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"otro\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"error\":{\"code\":\"VALIDATION_ERROR\",\"message\":\"business.taxRegime no es válido\"}}"
+ },
+ {
+  "name": "TC-18.13 La verificación sigue APPROVED tras los rechazos",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_a9fafbb148b2",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_a9fafbb148b2\",\"status\":\"APPROVED\",\"attempt\":1,\"person\":{\"cui\":\"2176790810101\",\"firstName\":\"Karla\",\"lastName\":\"Hernández Xol\",\"birthDate\":\"1990-01-10\",\"documentExpiry\":\"2033-04-20\",\"gender\":\"F\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_a9fafbb148b2/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_a9fafbb148b2/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_a9fafbb148b2/selfie.jpg\"},\"expires_at\":\"2026-10-21T01:54:40.814Z\",\"createdAt\":\"2026-10-21T01:24:40.792Z\"}"
+ },
+ {
+  "name": "TC-18.14 Alta con NIT de 6 dígitos (límite inferior válido)",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_a9fafbb148b2",
+   "Idempotency-Key": "7699def2-1431-40e9-97f3-6f1e6f8083e2"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"123456\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"signupId\":\"sgn_8277825b3716\",\"channel\":\"alfa\",\"invitationCode\":\"INV-EEE474\",\"codeStatus\":\"CONSUMED\",\"person\":{\"cui\":\"2176790810101\",\"firstName\":\"Karla\",\"lastName\":\"Hernández Xol\"},\"business\":{\"commercialName\":\"Tienda La Ceiba\",\"nit\":\"123456\",\"address\":\"5a avenida 10-20 zona 1, Guatemala\",\"phone\":\"55551234\",\"economicActivity\":\"Abarrotería\",\"taxRegime\":\"pequeño contribuyente\",\"paymentMethods\":[\"qr\",\"card\"]},\"verificationId\":\"kyc_a9fafbb148b2\",\"createdAt\":\"2026-10-21T01:24:41.421Z\"}"
+ },
+ {
+  "name": "TC-18.15 Sesión para el campo extra",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc18x-1792545881452-965752"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_aba75cc995b6\",\"providerSessionId\":\"ps_858d28f62ccb\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_858d28f62ccb\"}"
+ },
+ {
+  "name": "TC-18.16 Aprobar",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_858d28f62ccb/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"approved\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_d62ab1845c4a\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_b5ced5626fc9\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-18.17 Alta con campo extra en business",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_aba75cc995b6",
+   "Idempotency-Key": "d72eb86e-6690-490f-ab42-9a35fdfea2c2"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ],\n            \"email\": \"a@b.com\"\n          }\n        }",
+  "response": "{\"signupId\":\"sgn_86254dc5a400\",\"channel\":\"alfa\",\"invitationCode\":\"INV-B31796\",\"codeStatus\":\"CONSUMED\",\"person\":{\"cui\":\"1710855320101\",\"firstName\":\"Lucía\",\"lastName\":\"García Pop\"},\"business\":{\"commercialName\":\"Tienda La Ceiba\",\"nit\":\"1234567K\",\"address\":\"5a avenida 10-20 zona 1, Guatemala\",\"phone\":\"55551234\",\"economicActivity\":\"Abarrotería\",\"taxRegime\":\"pequeño contribuyente\",\"paymentMethods\":[\"qr\",\"card\"]},\"verificationId\":\"kyc_aba75cc995b6\",\"createdAt\":\"2026-10-21T01:24:41.907Z\"}"
+ },
+ {
+  "name": "TC-07.1 Sesión V1",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc07a-1792545881937-828955"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_e10dbd8aa35f\",\"providerSessionId\":\"ps_4efbe731ca79\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_4efbe731ca79\"}"
+ },
+ {
+  "name": "TC-07.2 Aprobar V1",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_4efbe731ca79/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"approved\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_843705beda68\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_e2393f32f805\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-07.3 Sesión V2",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc07b-1792545881988-520742"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_be62c9ebd02d\",\"providerSessionId\":\"ps_3cb7407c9cd2\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_3cb7407c9cd2\"}"
+ },
+ {
+  "name": "TC-07.4 Aprobar V2",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_3cb7407c9cd2/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"approved\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_3cc62bdffceb\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_e1a956bd9a3a\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-07.5 Sesión V3",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc07c-1792545882031-341641"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_1859929bff32\",\"providerSessionId\":\"ps_4eef90f9369e\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_4eef90f9369e\"}"
+ },
+ {
+  "name": "TC-07.6 Aprobar V3",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/sessions/ps_4eef90f9369e/complete",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"scenario\":\"approved\"}",
+  "response": "{\"delivered\":[{\"eventId\":\"evt_d727b8cb3de3\",\"type\":\"document.processed\",\"httpStatus\":200},{\"eventId\":\"evt_aa88f1e21fa3\",\"type\":\"check.completed\",\"httpStatus\":200}]}"
+ },
+ {
+  "name": "TC-07.7 Adelantar el reloj 29 minutos",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/clock",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"advanceMinutes\":29}",
+  "response": "{\"now\":\"2026-10-21T01:53:42.076Z\"}"
+ },
+ {
+  "name": "TC-07.8 Alta con V1 a los 29 minutos",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_e10dbd8aa35f",
+   "Idempotency-Key": "49218bbd-7b11-4fad-a582-cee73aeb4cee"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"signupId\":\"sgn_2fb85d30c0e5\",\"channel\":\"alfa\",\"invitationCode\":\"INV-775246\",\"codeStatus\":\"CONSUMED\",\"person\":{\"cui\":\"2161473110101\",\"firstName\":\"Pedro\",\"lastName\":\"García Pop\"},\"business\":{\"commercialName\":\"Tienda La Ceiba\",\"nit\":\"1234567K\",\"address\":\"5a avenida 10-20 zona 1, Guatemala\",\"phone\":\"55551234\",\"economicActivity\":\"Abarrotería\",\"taxRegime\":\"pequeño contribuyente\",\"paymentMethods\":[\"qr\",\"card\"]},\"verificationId\":\"kyc_e10dbd8aa35f\",\"createdAt\":\"2026-10-21T01:53:42.494Z\"}"
+ },
+ {
+  "name": "TC-07.9 Adelantar 1 minuto (30:00)",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/clock",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"advanceMinutes\":1}",
+  "response": "{\"now\":\"2026-10-21T01:54:42.542Z\"}"
+ },
+ {
+  "name": "TC-07.10 Alta con V2 a los 30 minutos (supuesto A-04: sigue válida)",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_be62c9ebd02d",
+   "Idempotency-Key": "d74f7b11-741f-4b29-90df-ff1da501772a"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"signupId\":\"sgn_4877e52bdf3e\",\"channel\":\"alfa\",\"invitationCode\":\"INV-86E6A4\",\"codeStatus\":\"CONSUMED\",\"person\":{\"cui\":\"1293109220101\",\"firstName\":\"Pedro\",\"lastName\":\"López Cux\"},\"business\":{\"commercialName\":\"Tienda La Ceiba\",\"nit\":\"1234567K\",\"address\":\"5a avenida 10-20 zona 1, Guatemala\",\"phone\":\"55551234\",\"economicActivity\":\"Abarrotería\",\"taxRegime\":\"pequeño contribuyente\",\"paymentMethods\":[\"qr\",\"card\"]},\"verificationId\":\"kyc_be62c9ebd02d\",\"createdAt\":\"2026-10-21T01:54:42.967Z\"}"
+ },
+ {
+  "name": "TC-07.11 Adelantar 1 minuto (31:00)",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/clock",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"advanceMinutes\":1}",
+  "response": "{\"now\":\"2026-10-21T01:55:43.001Z\"}"
+ },
+ {
+  "name": "TC-07.12 V3 aparece EXPIRED",
+  "method": "GET",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_1859929bff32",
+  "code": "200 - OK",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_1859929bff32\",\"status\":\"EXPIRED\",\"attempt\":1,\"person\":{\"cui\":\"1727137150101\",\"firstName\":\"Jorge\",\"lastName\":\"Ramírez Tun\",\"birthDate\":\"1992-03-16\",\"documentExpiry\":\"2033-04-20\",\"gender\":\"M\",\"nationality\":\"GTM\"},\"rejectReason\":null,\"images\":{\"documentFront\":\"https://storage.qa-wallet.example/public/identity/kyc_1859929bff32/front.jpg\",\"documentBack\":\"https://storage.qa-wallet.example/public/identity/kyc_1859929bff32/back.jpg\",\"selfie\":\"https://storage.qa-wallet.example/public/identity/kyc_1859929bff32/selfie.jpg\"},\"expires_at\":\"2026-10-21T01:54:42.060Z\",\"createdAt\":\"2026-10-21T01:24:42.036Z\"}"
+ },
+ {
+  "name": "TC-07.13 Alta con V3 a los 31 minutos",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/signups",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "Verification-Id": "kyc_1859929bff32",
+   "Idempotency-Key": "67527374-1a8b-45b2-b3f2-948d643b9a2a"
+  },
+  "request": "{\n          \"business\": {\n            \"commercialName\": \"Tienda La Ceiba\",\n            \"nit\": \"1234567K\",\n            \"address\": \"5a avenida 10-20 zona 1, Guatemala\",\n            \"phone\": \"55551234\",\n            \"economicActivity\": \"Abarrotería\",\n            \"taxRegime\": \"pequeño contribuyente\",\n            \"paymentMethods\": [\n              \"qr\",\n              \"card\"\n            ]\n          }\n        }",
+  "response": "{\"signupId\":\"sgn_ddfa326af8a8\",\"channel\":\"alfa\",\"invitationCode\":\"INV-497A68\",\"codeStatus\":\"CONSUMED\",\"person\":{\"cui\":\"1727137150101\",\"firstName\":\"Jorge\",\"lastName\":\"Ramírez Tun\"},\"business\":{\"commercialName\":\"Tienda La Ceiba\",\"nit\":\"1234567K\",\"address\":\"5a avenida 10-20 zona 1, Guatemala\",\"phone\":\"55551234\",\"economicActivity\":\"Abarrotería\",\"taxRegime\":\"pequeño contribuyente\",\"paymentMethods\":[\"qr\",\"card\"]},\"verificationId\":\"kyc_1859929bff32\",\"createdAt\":\"2026-10-21T01:55:43.443Z\"}"
+ },
+ {
+  "name": "TC-12.1 Intento 1 con el dispositivo D1",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc12-1792545883476-234350"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_bb5a2db33072\",\"providerSessionId\":\"ps_70e83c938857\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_70e83c938857\"}"
+ },
+ {
+  "name": "TC-12.2 Intento 2 con D1",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc12-1792545883476-234350"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_5d7d95505efb\",\"providerSessionId\":\"ps_fad1e3d85d6d\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_fad1e3d85d6d\"}"
+ },
+ {
+  "name": "TC-12.3 Intento 3 con D1",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc12-1792545883476-234350"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_745e06f6aed8\",\"providerSessionId\":\"ps_b344b3365759\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_b344b3365759\"}"
+ },
+ {
+  "name": "TC-12.4 Intento 4 con D1 se rechaza",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc12-1792545883476-234350"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_935d46be8d09\",\"providerSessionId\":\"ps_abfde03f6d50\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_abfde03f6d50\"}"
+ },
+ {
+  "name": "TC-12.5 D1 en otro comercio (M-ESTE) se permite",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_este",
+   "X-Device-Id": "dev-dev_tc12-1792545883476-234350"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_623412376cda\",\"providerSessionId\":\"ps_61e60293df40\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_61e60293df40\"}"
+ },
+ {
+  "name": "TC-12.6 Sin X-Device-Id",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "400 - Bad Request",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": "{\"error\":{\"code\":\"DEVICE_ID_REQUIRED\",\"message\":\"Falta el header X-Device-Id.\"}}"
+ },
+ {
+  "name": "TC-12.7 D2: sesión que se cancelará (1)",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc12b-1792545883599-405029"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_b1d6b8cb4762\",\"providerSessionId\":\"ps_cbf9667e535c\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_cbf9667e535c\"}"
+ },
+ {
+  "name": "TC-12.8 Cancelar (1)",
+  "method": "DELETE",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_b1d6b8cb4762",
+  "code": "204 - No Content",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": null
+ },
+ {
+  "name": "TC-12.9 D2: sesión que se cancelará (2)",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc12b-1792545883599-405029"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_171ec75568f8\",\"providerSessionId\":\"ps_18fa2f59c183\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_18fa2f59c183\"}"
+ },
+ {
+  "name": "TC-12.10 Cancelar (2)",
+  "method": "DELETE",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_171ec75568f8",
+  "code": "204 - No Content",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": null
+ },
+ {
+  "name": "TC-12.10b D2: sesión que se cancelará (3)",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc12b-1792545883599-405029"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_414fc2bdf9e3\",\"providerSessionId\":\"ps_4be3b27fa9e4\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_4be3b27fa9e4\"}"
+ },
+ {
+  "name": "TC-12.10c Cancelar (3)",
+  "method": "DELETE",
+  "url": "http://localhost:4010/v1/identity/verifications/kyc_414fc2bdf9e3",
+  "code": "204 - No Content",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte"
+  },
+  "request": null,
+  "response": null
+ },
+ {
+  "name": "TC-12.11 D2: intento válido 1",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc12b-1792545883599-405029"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_fd47a587d5d7\",\"providerSessionId\":\"ps_fecf0e435021\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_fecf0e435021\"}"
+ },
+ {
+  "name": "TC-12.12 D2: intento válido 2",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc12b-1792545883599-405029"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_f96b456b98f6\",\"providerSessionId\":\"ps_2f046615fe55\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_2f046615fe55\"}"
+ },
+ {
+  "name": "TC-12.13 D2: intento válido 3 (las canceladas no cuentan)",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc12b-1792545883599-405029"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_3e9d9ba4796a\",\"providerSessionId\":\"ps_070305bd3461\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_070305bd3461\"}"
+ },
+ {
+  "name": "TC-12.14 D2: el 4.º intento válido se rechaza",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc12b-1792545883599-405029"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_f345de2daeac\",\"providerSessionId\":\"ps_2b24a3498f25\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_2b24a3498f25\"}"
+ },
+ {
+  "name": "TC-12.15 Adelantar el reloj 24 h + 1 min",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/_sandbox/clock",
+  "code": "200 - OK",
+  "headers": {},
+  "request": "{\"advanceMinutes\":1441}",
+  "response": "{\"now\":\"2026-10-22T01:56:43.771Z\"}"
+ },
+ {
+  "name": "TC-12.16 D1 vuelve a tener intentos tras 24 h",
+  "method": "POST",
+  "url": "http://localhost:4010/v1/identity/sessions",
+  "code": "201 - Created",
+  "headers": {
+   "Authorization": "Bearer tok_app_norte",
+   "X-Device-Id": "dev-dev_tc12-1792545883476-234350"
+  },
+  "request": null,
+  "response": "{\"verificationId\":\"kyc_407837afe7c6\",\"providerSessionId\":\"ps_b0942d93f2cd\",\"status\":\"PENDING\",\"captureUrl\":\"https://capture.idv-sandbox.example/s/ps_b0942d93f2cd\"}"
+ }
+]

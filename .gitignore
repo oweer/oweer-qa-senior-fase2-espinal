@@ -1,0 +1,30 @@
+# Material del caso: no se debe subir (reglas del documento)
+ambiente/
+*.pdf
+
+# Bases de datos SQLite (qa.db y tus copias)
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# Dependencias y resultados de la suite (E5)
+node_modules/
+playwright-report/
+test-results/
+blob-report/
+.cache/
+coverage/
+
+# Secretos y variables locales
+.env
+.env.*
+!.env.example
+
+# Sistema y editores
+.DS_Store
+.vscode/
+.idea/
+*.log

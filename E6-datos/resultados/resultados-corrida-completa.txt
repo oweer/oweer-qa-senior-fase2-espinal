@@ -1,0 +1,115 @@
+Base: qa_completo_20261020_1925.db
+
+== Q01 Inventario por origen y formato de las horas
+tabla | origen | registros | desde | hasta | horas_sin_utc
+invitation_codes | corrida_qa | 39 | 2026-10-21T01:24:33.801Z | 2026-10-22T01:57:02.504Z | 0
+invitation_codes | sprint_anterior | 9 | 2026-10-14T15:05:00Z | 2026-10-16T00:02:00Z | 0
+kyc_checks | corrida_qa | 65 | 2026-10-21T01:24:33.348Z | 2026-10-22T01:57:02.520Z | 0
+kyc_checks | sprint_anterior | 12 | 2026-10-14T15:02:11Z | 2026-10-15T23:58:00Z | 0
+signups | corrida_qa | 39 | 2026-10-21T01:24:33.801Z | 2026-10-22T01:57:02.504Z | 0
+signups | sprint_anterior | 9 | 2026-10-14T15:05:00Z | 2026-10-16T00:02:00Z | 0
+-- 6 fila(s)
+
+== Q02 Altas duplicadas: mismo CUI en el mismo comercio (CA-07, CA-10)
+origen | merchant_id | cui_enmascarado | altas | signups
+sprint_anterior | M-ESTE | *********0108 | 2 | sgn_h03, sgn_h04
+corrida_qa | M-NORTE | *********0101 | 10 | sgn_c742de8f0eb9, sgn_e1cf3483b070, sgn_4370dcc4cb9e, sgn_df1e682a75f6, sgn_45b556b0c6b5, sgn_d285a3c048be, sgn_4e19fc1870b6, sgn_c6697ed6cf2c, sgn_419f4c57984c, sgn_5d0fdf9ad824
+corrida_qa | M-NORTE | *********0101 | 10 | sgn_ad98dfc582c2, sgn_b4303cba9055, sgn_25392f7c5fa7, sgn_23c3137fd851, sgn_f9b183f99d30, sgn_77a4247c31b9, sgn_d887a1691e19, sgn_89ec3d59c756, sgn_7bbd61e8ca38, sgn_e8a315e387fc
+corrida_qa | M-NORTE | *********0101 | 2 | sgn_7c1e59edc1ba, sgn_c8e46140f7ca
+-- 4 fila(s)
+
+== Q03 Una verificación usada por más de un alta (CA-06, CA-10)
+origen | kyc_check_id | altas | signups
+sprint_anterior | kyc_h03 | 2 | sgn_h03, sgn_h04
+corrida_qa | kyc_1d8e5d75e483 | 10 | sgn_ad98dfc582c2, sgn_b4303cba9055, sgn_25392f7c5fa7, sgn_23c3137fd851, sgn_f9b183f99d30, sgn_77a4247c31b9, sgn_d887a1691e19, sgn_89ec3d59c756, sgn_7bbd61e8ca38, sgn_e8a315e387fc
+corrida_qa | kyc_b6beae9a9477 | 10 | sgn_c742de8f0eb9, sgn_e1cf3483b070, sgn_4370dcc4cb9e, sgn_df1e682a75f6, sgn_45b556b0c6b5, sgn_d285a3c048be, sgn_4e19fc1870b6, sgn_c6697ed6cf2c, sgn_419f4c57984c, sgn_5d0fdf9ad824
+-- 3 fila(s)
+
+== Q04 Altas creadas desde una verificación que no estaba aprobada (gate del servidor, CA-06)
+origen | signup | verificacion | status | reject_reason | approved_at | face_match_score | liveness_score
+sprint_anterior | sgn_h02 | kyc_h02 | REJECTED | LIVENESS_FAILED | 2026-10-14T16:10:30Z |  | 0.12
+sprint_anterior | sgn_h07 | kyc_h06 | CONSUMED |  |  |  | 
+corrida_qa | sgn_a92752e64e33 | kyc_20ae2eaef20e | CONSUMED |  |  |  | 
+corrida_qa | sgn_bf9bea755ee7 | kyc_f352e0b9e35a | APPROVED |  | 2026-10-21T01:24:38.919Z | 0.95 | 0.97
+-- 4 fila(s)
+
+== Q05 Alta creada fuera de la ventana de 30 minutos de la aprobación (CA-06, A-04)
+origen | signup | verificacion | approved_at | expires_at | alta_creada | minutos_desde_aprobacion
+corrida_qa | sgn_bf9bea755ee7 | kyc_f352e0b9e35a | 2026-10-21T01:24:38.919Z | 2026-10-21T01:54:38.919Z | 2026-10-21T01:24:38.878Z | -0.0
+corrida_qa | sgn_4877e52bdf3e | kyc_be62c9ebd02d | 2026-10-21T01:24:42.017Z | 2026-10-21T01:54:42.017Z | 2026-10-21T01:54:42.967Z | 30.02
+corrida_qa | sgn_ddfa326af8a8 | kyc_1859929bff32 | 2026-10-21T01:24:42.060Z | 2026-10-21T01:54:42.060Z | 2026-10-21T01:55:43.443Z | 31.02
+-- 3 fila(s)
+
+== Q06 La persona del alta no es la persona de la verificación (Regla 3, CA-04)
+origen | signup | verificacion | cui_alta | cui_verificacion | nombre_alta | nombre_verificacion
+sprint_anterior | sgn_h05 | kyc_h04 | *********0101 | *********0108 | Byron Alvarado Quino | Julio César Morales Coyoy
+corrida_qa | sgn_bf9bea755ee7 | kyc_f352e0b9e35a | *********0101 | *********1234 | Andrea López Cux | Lucía Tzul Ajú
+corrida_qa | sgn_1191b8bbb26d | kyc_5bb9ada3bd5e | *********1111 | *********0101 | Otra Persona | Andrea López Cux
+-- 3 fila(s)
+
+== Q07 Comercio o canal del alta distinto al de la verificación o al configurado en el comercio (Regla 3)
+origen | signup | merchant_id | canal_alta | canal_comercio | comercio_verificacion
+sprint_anterior | sgn_h06 | M-ESTE | omega | alfa | M-ESTE
+corrida_qa | sgn_9d6c413912bb | M-NORTE | beta | alfa | M-NORTE
+-- 2 fila(s)
+
+== Q08 Verificaciones aprobadas o consumidas bajo el umbral facial del comercio (CA-03)
+origen | verificacion | merchant_id | status | face_match_score | umbral | signup
+sprint_anterior | kyc_h06 | M-NORTE | CONSUMED |  | 0.8 | sgn_h07
+sprint_anterior | kyc_h07 | M-NORTE | CONSUMED | 0.74 | 0.8 | sgn_h08
+corrida_qa | kyc_a96ec5bb895c | M-NORTE | CONSUMED | 0.72 | 0.8 | sgn_5cf63fa59aa9
+corrida_qa | kyc_20ae2eaef20e | M-NORTE | CONSUMED |  | 0.8 | sgn_a92752e64e33
+corrida_qa | kyc_595d4113459c | M-NORTE | APPROVED | 0.79 | 0.8 | 
+-- 5 fila(s)
+
+== Q09 Verificaciones aprobadas o consumidas con el DPI vencido al momento de aprobar (CA-02)
+origen | verificacion | merchant_id | status | document_expiry | aprobada | signup
+sprint_anterior | kyc_h05 | M-ESTE | CONSUMED | 2025-06-15 | 2026-10-15T03:20:10Z | sgn_h06
+corrida_qa | kyc_3cd32c943ccc | M-NORTE | APPROVED | 2024-01-31 | 2026-10-21T01:24:35.895Z | 
+corrida_qa | kyc_6069e76b442e | M-NORTE | APPROVED | 2024-01-31 | 2026-10-21T01:24:36.194Z | 
+-- 3 fila(s)
+
+== Q10 Verificaciones aprobadas o consumidas sin alguno de los 7 datos del DPI (CA-02, A-17)
+origen | verificacion | status | faltan
+(sin filas)
+-- 0 fila(s)
+
+== Q11 Coherencia de estados y vencimiento (tabla de estados, A-04)
+origen | verificacion | status | approved_at | expires_at | consumed_by_signup_id | problema
+sprint_anterior | kyc_h02 | REJECTED | 2026-10-14T16:10:30Z | 2026-10-14T16:40:30Z | sgn_h02 | rechazada con aprobación o alta
+-- 1 fila(s)
+
+== Q12 Códigos de invitación: uno por alta, del mismo comercio, con formato INV-XXXXXX y CONSUMED (CA-05)
+origen | signup | codigos | code | estado | comercio_codigo | merchant_id
+sprint_anterior | sgn_h07 | 1 | INV-5T6Y7G | GENERATED | M-NORTE | M-NORTE
+-- 1 fila(s)
+
+== Q13 Más de 3 intentos por dispositivo y comercio en 24 horas (CA-08; las canceladas no cuentan, A-16)
+origen | merchant_id | device_id | sesion | created_at | intentos_en_24h_hasta_esta | max_attempts
+sprint_anterior | M-NORTE | dev-h08 | kyc_h11 | 2026-10-15T16:11:00Z | 4 | 3
+corrida_qa | M-NORTE | dev-dev_tc12-1792545883476-234350 | kyc_935d46be8d09 | 2026-10-21T01:55:43.548Z | 4 | 3
+corrida_qa | M-NORTE | dev-dev_tc12b-1792545883599-405029 | kyc_f345de2daeac | 2026-10-21T01:55:43.757Z | 4 | 3
+corrida_qa | M-NORTE | conc-dev-fe9c8b4b-8cf9-446f-9ff9-a3610ca4245f | kyc_2d3dd8a4adbb | 2026-10-22T01:57:02.520Z | 4 | 3
+-- 4 fila(s)
+
+== Q14 Datos personales expuestos: CUI completo en api_logs (Regla 8) e imágenes con URL pública (Regla 4)
+hallazgo | origen | registros
+api_logs con CUI de 13 dígitos | sprint_anterior | 1
+api_logs con CUI de 13 dígitos | corrida_qa | 76
+api_logs total | sprint_anterior | 2
+api_logs total | corrida_qa | 257
+verificaciones con imagen en /public/ | sprint_anterior | 12
+verificaciones con imagen en /public/ | corrida_qa | 40
+-- 6 fila(s)
+
+== Q15 ¿Cuántas altas se crearon el 15 de octubre de 2026, hora de Guatemala (UTC-6)?
+origen | signup | merchant_id | creada_utc | creada_guatemala
+sprint_anterior | sgn_h08 | M-NORTE | 2026-10-15T14:05:00Z | 2026-10-15 08:05:00
+sprint_anterior | sgn_h09 | M-ESTE | 2026-10-16T00:02:00Z | 2026-10-15 18:02:00
+-- 2 fila(s)
+
+== Q16 Contraste: el mismo conteo con la fecha en UTC (el error típico)
+criterio | altas | signups
+fecha UTC = 2026-10-15 | 4 | sgn_h05, sgn_h06, sgn_h07, sgn_h08
+fecha Guatemala = 2026-10-15 | 2 | sgn_h08, sgn_h09
+-- 2 fila(s)

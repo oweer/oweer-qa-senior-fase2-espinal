@@ -1,0 +1,18 @@
+Ambiente: http://localhost:4010 · 10 solicitudes simultáneas por prueba
+
+TC-10.1 · Misma verificación y misma Idempotency-Key en paralelo (CA-10)
+  ✔ Todas responden 201 (la respuesta original)
+  ✘ Todas apuntan a la misma alta  → 10 signupId distintos
+
+TC-10.2 · Misma verificación con llaves distintas en paralelo (CA-06)
+  ✘ Exactamente una solicitud crea el alta  → 10 respuestas 201: [201,201,201,201,201,201,201,201,201,201]
+  ✘ El resto responde 409 VERIFICATION_ALREADY_USED  → [201,201,201,201,201,201,201,201,201,201]
+
+TC-10.3 · Mismo CUI (persona B) con dos verificaciones en paralelo en el mismo comercio (CA-07)
+  ✘ Ambas solicitudes devuelven la misma alta (nunca dos altas para el mismo CUI)  → 2 signupId distintos: [201,201]
+  ✘ Una crea (201) y la otra reutiliza (200)  → [201,201]
+
+TC-12 · Sesiones simultáneas con el mismo dispositivo (CA-08)
+  ✘ Como máximo 3 sesiones creadas  → 4 sesiones creadas: [201,201,201,201,409,409]
+
+6 validación(es) fallaron
