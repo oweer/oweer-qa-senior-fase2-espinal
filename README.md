@@ -117,8 +117,3 @@ El script abre la base en modo solo lectura, corre las 16 consultas de `E6-datos
 
 Las condiciones para volver a evaluar están en el [E7](E7-informe/E7-Informe-HU-410.docx).
 
-## Notas
-
-- No se suben `qa.db`, sus copias ni el contenido de `ambiente/` (ver `.gitignore`).
-- Todos los datos de prueba son ficticios. En el E6 los CUI se muestran enmascarados.
-- La app móvil no venía en el paquete: los casos TC-M01 a TC-M06 quedan diseñados, sin ejecutar.
