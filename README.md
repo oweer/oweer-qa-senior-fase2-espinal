@@ -8,7 +8,7 @@ Caso práctico de QA Senior: **alta de comercios sin código de invitación, con
 | **Contacto** | belly.espinal17@gmail.com |
 | **Ejecución** | 20 de octubre de 2026 (hora de Guatemala), ambiente de QA local |
 | **Recomendación** | **NO-GO** (ver [E7](E7-informe/E7-Informe-HU-410.docx)) |
-| **Video** | https://we.tl/t-vYuouaV8Qm63Wj2U |
+| **Video** | https://we.tl/t-8ha5feR5xpgGZjmz
 
 ## Resultado en una línea
 
